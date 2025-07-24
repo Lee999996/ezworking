@@ -1,100 +1,67 @@
-/**
- * 用户档案 API 路由
- * GET /api/user/profile - 获取用户档案
- * PUT /api/user/profile - 更新用户档案
- */
-
 import { NextRequest, NextResponse } from 'next/server'
-import { UserService } from '@/services'
-import type { ApiResponse, UpdateUserProfileRequest } from '@/types'
+import { UserService } from '@/services/user'
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { cookies } from 'next/headers'
 
-/**
- * 获取用户档案
- */
-export async function GET(request: NextRequest) {
+export async function GET() {
+  const supabase = createRouteHandlerClient({ cookies })
   try {
-    // 从请求头或查询参数获取用户ID（实际应用中应从JWT token获取）
-    const userId = request.nextUrl.searchParams.get('userId')
-    
-    if (!userId) {
-      return NextResponse.json<ApiResponse>({
-        success: false,
-        error: 'User ID is required',
-      }, { status: 400 })
-    }
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) return NextResponse.json({ error: '未认证' }, { status: 401 })
 
-    const result = await UserService.getCompleteProfile(userId)
-    
-    if (!result.success) {
-      return NextResponse.json<ApiResponse>({
-        success: false,
-        error: result.error || 'Failed to get user profile',
-      }, { status: 404 })
-    }
+    const profile = await UserService.getProfile(session.user.id)
+    if (!profile) return NextResponse.json({ error: '用户档案不存在' }, { status: 404 })
 
-    return NextResponse.json<ApiResponse>({
-      success: true,
-      data: result.data,
-    })
-
+    return NextResponse.json({ data: profile })
   } catch (error) {
-    console.error('GET /api/user/profile error:', error)
-    return NextResponse.json<ApiResponse>({
-      success: false,
-      error: 'Internal server error',
-    }, { status: 500 })
+    console.error('Error in GET /api/user/profile:', error)
+    return NextResponse.json({ error: '获取用户档案失败' }, { status: 500 })
   }
 }
 
-/**
- * 更新用户档案
- */
-export async function PUT(request: NextRequest) {
+export async function POST(request: NextRequest) {
+  const supabase = createRouteHandlerClient({ cookies })
   try {
-    const userId = request.nextUrl.searchParams.get('userId')
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) return NextResponse.json({ error: '未认证' }, { status: 401 })
+
+    const body = await request.json()
+    const profile = await UserService.createProfile({ ...body, id: session.user.id })
     
-    if (!userId) {
-      return NextResponse.json<ApiResponse>({
-        success: false,
-        error: 'User ID is required',
-      }, { status: 400 })
-    }
-
-    const body: UpdateUserProfileRequest = await request.json()
-    
-    // 验证必要字段
-    if (!body || typeof body !== 'object') {
-      return NextResponse.json<ApiResponse>({
-        success: false,
-        error: 'Invalid request body',
-      }, { status: 400 })
-    }
-
-    const result = await UserService.upsertUserProfile(userId, body)
-    
-    if (!result.success) {
-      return NextResponse.json<ApiResponse>({
-        success: false,
-        error: result.error || 'Failed to update user profile',
-      }, { status: 400 })
-    }
-
-    // 记录用户操作
-    await UserService.logUserAction(userId, 'profile_update', result.data?.id, {
-      updatedFields: Object.keys(body),
-    })
-
-    return NextResponse.json<ApiResponse>({
-      success: true,
-      data: result.data,
-      message: '用户档案更新成功',
-    })
-
+    return NextResponse.json({ data: profile }, { status: 201 })
   } catch (error) {
-    console.error('PUT /api/user/profile error:', error)
-    return NextResponse.json<ApiResponse>({
-      success: false,
-      error: 'Internal server error',
-    }, { status: 500 })
+    console.error('Error in POST /api/user/profile:', error)
+    return NextResponse.json({ error: '创建用户档案失败' }, { status: 500 })
+  }
+}
+
+export async function PUT(request: NextRequest) {
+  const supabase = createRouteHandlerClient({ cookies })
+  try {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) return NextResponse.json({ error: '未认证' }, { status: 401 })
+
+    const body = await request.json()
+    const profile = await UserService.updateProfile(session.user.id, body)
+    
+    return NextResponse.json({ data: profile })
+  } catch (error) {
+    console.error('Error in PUT /api/user/profile:', error)
+    return NextResponse.json({ error: '更新用户档案失败' }, { status: 500 })
+  }
+}
+
+export async function DELETE() {
+  const supabase = createRouteHandlerClient({ cookies })
+  try {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) return NextResponse.json({ error: '未认证' }, { status: 401 })
+
+    await UserService.deleteUser(session.user.id)
+    
+    return NextResponse.json({ message: '用户删除成功' })
+  } catch (error) {
+    console.error('Error in DELETE /api/user/profile:', error)
+    return NextResponse.json({ error: '删除用户失败' }, { status: 500 })
   }
 } 

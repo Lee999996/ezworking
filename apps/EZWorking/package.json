@@ -1,56 +1,26 @@
 {
-  "name": "ezworking",
-  "version": "0.1.0",
-  "description": "EZWorking - AI求职助手，智能化一站式求职解决方案",
+  "name": "@ezworking/web",
+  "version": "0.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build", 
+    "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "type-check": "tsc --noEmit",
-    "db:reset": "supabase db reset",
-    "db:push": "supabase db push",
-    "db:types": "supabase gen types typescript --local > src/lib/db/types.ts"
+    "lint": "next lint"
   },
   "dependencies": {
-    "next": "^14.0.0",
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0",
-    "@supabase/supabase-js": "^2.38.0",
-    "@emotion/react": "^11.11.0",
-    "@emotion/styled": "^11.11.0",
-    "@chakra-ui/react": "^2.8.0",
-    "@chakra-ui/icons": "^2.1.0",
-    "framer-motion": "^10.16.0"
+    "@supabase/auth-helpers-nextjs": "^0.10.0",
+    "@supabase/supabase-js": "^2.52.1",
+    "next": "14.2.3",
+    "react": "^18",
+    "react-dom": "^18"
   },
   "devDependencies": {
-    "@types/node": "^20.0.0",
-    "@types/react": "^18.0.0",
-    "@types/react-dom": "^18.0.0",
-    "typescript": "^5.0.0",
-    "eslint": "^8.0.0",
-    "eslint-config-next": "^14.0.0",
-    "@typescript-eslint/eslint-plugin": "^6.0.0",
-    "@typescript-eslint/parser": "^6.0.0",
-    "prettier": "^3.0.0",
-    "supabase": "^1.110.0"
-  },
-  "keywords": [
-    "ai",
-    "job-search", 
-    "career",
-    "assessment",
-    "interview",
-    "recruitment",
-    "nextjs",
-    "typescript",
-    "supabase"
-  ],
-  "author": "EZWorking Team",
-  "license": "MIT",
-  "engines": {
-    "node": ">=18.0.0",
-    "npm": ">=8.0.0"
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.3",
+    "typescript": "^5"
   }
-} 
+}

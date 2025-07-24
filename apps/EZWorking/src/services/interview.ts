@@ -1,553 +1,484 @@
+import { supabase } from '../lib/db/supabase'
+
 /**
- * 面试服务层
- * 处理面试题库、模拟面试、面试记录等业务逻辑
+ * 面试服务 - 处理面试准备、模拟面试和面试记录
  */
 
-import { supabase, handleDatabaseError, type DatabaseResult } from '../lib/db/supabase'
-import type {
-  InterviewRecord,
-  InterviewRecordInsert,
-  InterviewRecordUpdate
-} from '../lib/db/types'
-import type {
-  InterviewQuestion,
-  InterviewSession,
-  RealInterviewRecord,
-  InterviewAnalytics,
-  StartInterviewSessionRequest,
-  SubmitResponseRequest,
-  GetRecommendedQuestionsRequest,
-  InterviewAnalyticsRequest,
-  SessionType,
-  InterviewCategory
-} from '../types'
+export interface InterviewSession {
+  id: string
+  user_id: string
+  position_id?: string
+  type: 'mock' | 'practice' | 'behavioral' | 'technical' | 'case_study'
+  questions: Array<InterviewQuestion>
+  answers: Array<InterviewAnswer>
+  feedback?: InterviewFeedback
+  score?: number
+  completed_at?: string
+  created_at: string
+  updated_at: string
+}
+
+export interface InterviewQuestion {
+  id: string
+  question: string
+  type: 'technical' | 'behavioral' | 'case_study' | 'general'
+  difficulty: 'easy' | 'medium' | 'hard'
+  category?: string
+  expected_duration?: number
+  keywords?: Array<string>
+}
+
+export interface InterviewAnswer {
+  question_id: string
+  answer: string
+  duration?: number
+  timestamp: string
+  confidence_level?: number
+}
+
+export interface InterviewFeedback {
+  overall_score: number
+  question_scores: Record<string, number>
+  strengths: Array<string>
+  areas_for_improvement: Array<string>
+  detailed_feedback: Record<string, any>
+  suggestions: Array<string>
+}
+
+export interface InterviewLog {
+  id: string
+  user_id: string
+  company: string
+  position: string
+  interview_date: string
+  stage: 'phone_screen' | 'first_round' | 'second_round' | 'final_round' | 'other'
+  result?: 'pending' | 'passed' | 'rejected' | 'cancelled' | 'rescheduled'
+  feedback?: string
+  notes?: string
+  created_at: string
+  updated_at: string
+}
+
+export interface CreateInterviewSessionInput {
+  user_id: string
+  position_id?: string
+  type: 'mock' | 'practice' | 'behavioral' | 'technical' | 'case_study'
+  questions?: Array<InterviewQuestion>
+}
+
+export interface CreateInterviewLogInput {
+  user_id: string
+  company: string
+  position: string
+  interview_date: string
+  stage: 'phone_screen' | 'first_round' | 'second_round' | 'final_round' | 'other'
+  result?: 'pending' | 'passed' | 'rejected' | 'cancelled' | 'rescheduled'
+  feedback?: string
+  notes?: string
+}
 
 export class InterviewService {
   /**
-   * 获取面试题库
+   * 获取用户的面试会话列表
    */
-  static async getInterviewQuestions(
-    category?: InterviewCategory,
-    difficulty?: 'easy' | 'medium' | 'hard',
-    limit: number = 20
-  ): Promise<DatabaseResult<Array<InterviewQuestion>>> {
-    let query = supabase
-      .from('interview_questions')
-      .select('*')
-      .eq('is_active', true)
+  static async getUserInterviewSessions(userId: string): Promise<Array<InterviewSession>> {
+    try {
+      const { data, error } = await supabase
+        .from('interview_sessions')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
 
-    if (category) {
-      query = query.eq('category', category)
+      if (error || !data) return []
+      return data
+    } catch (error) {
+      console.error('Error getting user interview sessions:', error)
+      return []
     }
-
-    if (difficulty) {
-      query = query.eq('difficulty', difficulty)
-    }
-
-    const { data, error } = await query
-      .order('created_at', { ascending: false })
-      .limit(limit)
-
-    if (error) {
-      return handleDatabaseError(null, error)
-    }
-
-    const questions: Array<InterviewQuestion> = (data || []).map(item => ({
-      id: item.id,
-      category: item.category as InterviewCategory,
-      type: item.type as any,
-      question: item.question,
-      context: item.context || undefined,
-      difficulty: item.difficulty as any,
-      tags: item.tags || [],
-      industry: item.industry || undefined,
-      jobLevel: item.job_level as any,
-      sampleAnswers: item.sample_answers as any || [],
-      evaluationCriteria: item.evaluation_criteria as any || [],
-      followUpQuestions: item.follow_up_questions || [],
-      createdAt: item.created_at,
-      updatedAt: item.updated_at,
-    }))
-
-    return handleDatabaseError(questions, null)
   }
 
   /**
-   * 获取推荐的面试题目
+   * 创建面试会话
    */
-  static async getRecommendedQuestions(
-    request: GetRecommendedQuestionsRequest
-  ): Promise<DatabaseResult<Array<InterviewQuestion>>> {
-    // 获取用户的技能和经验信息来智能推荐题目
-    const { data: userProfile } = await supabase
-      .from('user_profiles')
-      .select('skills, work_experience')
-      .eq('user_id', request.userId)
-      .single()
+  static async createInterviewSession(input: CreateInterviewSessionInput): Promise<InterviewSession | null> {
+    try {
+      // 生成默认题目（后续可以通过AI生成）
+      const questions = input.questions || this.getDefaultQuestions(input.type)
 
-    // 根据用户信息和岗位要求推荐题目
-    let query = supabase
-      .from('interview_questions')
-      .select('*')
-      .eq('is_active', true)
+      const { data, error } = await supabase
+        .from('interview_sessions')
+        .insert([{
+          user_id: input.user_id,
+          position_id: input.position_id,
+          type: input.type,
+          questions: questions,
+          answers: [],
+          feedback: {}
+        }])
+        .select()
+        .single()
 
-    // 如果指定了面试类型，添加相应的筛选
-    if (request.interviewType === 'technical') {
-      query = query.eq('category', 'technical')
-    } else if (request.interviewType === 'behavioral') {
-      query = query.eq('category', 'behavioral')
+      if (error || !data) {
+        console.error('Error creating interview session:', error)
+        return null
+      }
+      return data
+    } catch (error) {
+      console.error('Error creating interview session:', error)
+      return null
     }
-
-    // 根据工作经验选择难度
-    const workExperience = userProfile?.work_experience || 0
-    let difficulty: 'easy' | 'medium' | 'hard' = 'easy'
-    if (workExperience >= 3) difficulty = 'medium'
-    if (workExperience >= 5) difficulty = 'hard'
-
-    const { data, error } = await query
-      .eq('difficulty', difficulty)
-      .limit(request.limit || 10)
-      .order('created_at', { ascending: false })
-
-    if (error) {
-      return handleDatabaseError(null, error)
-    }
-
-    const questions: Array<InterviewQuestion> = (data || []).map(item => ({
-      id: item.id,
-      category: item.category as InterviewCategory,
-      type: item.type as any,
-      question: item.question,
-      context: item.context || undefined,
-      difficulty: item.difficulty as any,
-      tags: item.tags || [],
-      industry: item.industry || undefined,
-      jobLevel: item.job_level as any,
-      sampleAnswers: item.sample_answers as any || [],
-      evaluationCriteria: item.evaluation_criteria as any || [],
-      followUpQuestions: item.follow_up_questions || [],
-      createdAt: item.created_at,
-      updatedAt: item.updated_at,
-    }))
-
-    return handleDatabaseError(questions, null)
   }
 
   /**
-   * 开始面试会话
+   * 提交面试答案
    */
-  static async startInterviewSession(
-    request: StartInterviewSessionRequest
-  ): Promise<DatabaseResult<InterviewSession>> {
-    // 获取推荐的题目
-    const questionsResult = await this.getRecommendedQuestions({
-      userId: request.userId,
-      jobTitle: request.jobTitle,
-      companyName: request.companyName,
-      interviewType: request.type,
-      limit: request.questionCount || 10,
-    })
+  static async submitInterviewAnswers(
+    sessionId: string, 
+    answers: Array<InterviewAnswer>
+  ): Promise<InterviewSession | null> {
+    try {
+      // 计算面试评分（这里可以集成AI评估）
+      const feedback = await this.generateFeedback(sessionId, answers)
+      const score = this.calculateOverallScore(feedback)
 
-    if (!questionsResult.success || !questionsResult.data) {
-      return handleDatabaseError(null, { message: 'Failed to get interview questions' })
+      const { data, error } = await supabase
+        .from('interview_sessions')
+        .update({
+          answers: answers,
+          feedback: feedback,
+          score: score,
+          completed_at: new Date().toISOString()
+        })
+        .eq('id', sessionId)
+        .select()
+        .single()
+
+      if (error || !data) {
+        console.error('Error submitting interview answers:', error)
+        return null
+      }
+      return data
+    } catch (error) {
+      console.error('Error submitting interview answers:', error)
+      return null
     }
-
-    const sessionData = {
-      user_id: request.userId,
-      type: request.type,
-      job_title: request.jobTitle,
-      company_name: request.companyName,
-      questions: questionsResult.data,
-      responses: [],
-      status: 'in_progress' as const,
-      started_at: new Date().toISOString(),
-    }
-
-    const { data, error } = await supabase
-      .from('interview_sessions')
-      .insert(sessionData)
-      .select()
-      .single()
-
-    if (error) {
-      return handleDatabaseError(null, error)
-    }
-
-    const session: InterviewSession = {
-      id: data.id,
-      userId: data.user_id,
-      type: data.type as SessionType,
-      jobTitle: data.job_title || undefined,
-      companyName: data.company_name || undefined,
-      questions: data.questions as Array<InterviewQuestion>,
-      responses: data.responses as any || [],
-      status: data.status as any,
-      startedAt: data.started_at,
-      completedAt: data.completed_at || undefined,
-      totalDuration: data.total_duration || undefined,
-      overallScore: data.overall_score ? Number(data.overall_score) : undefined,
-      feedback: data.feedback as any || undefined,
-    }
-
-    return handleDatabaseError(session, null)
-  }
-
-  /**
-   * 提交面试回答
-   */
-  static async submitResponse(request: SubmitResponseRequest): Promise<DatabaseResult<boolean>> {
-    // 获取现有会话数据
-    const { data: session, error: fetchError } = await supabase
-      .from('interview_sessions')
-      .select('responses, questions, started_at')
-      .eq('id', request.sessionId)
-      .single()
-
-    if (fetchError || !session) {
-      return handleDatabaseError(null, fetchError || { message: 'Session not found' })
-    }
-
-    const existingResponses = session.responses as Array<any> || []
-    const newResponses = [...existingResponses, request.response]
-
-    // 检查是否完成所有题目
-    const questions = session.questions as Array<any>
-    const isCompleted = newResponses.length >= questions.length
-
-    const updateData: any = {
-      responses: newResponses,
-    }
-
-    if (isCompleted) {
-      const totalDuration = Math.floor((Date.now() - new Date(session.started_at).getTime()) / 1000)
-      updateData.status = 'completed'
-      updateData.completed_at = new Date().toISOString()
-      updateData.total_duration = totalDuration
-      updateData.overall_score = this.calculateOverallScore(newResponses)
-      updateData.feedback = this.generateSessionFeedback(questions, newResponses)
-    }
-
-    const { error } = await supabase
-      .from('interview_sessions')
-      .update(updateData)
-      .eq('id', request.sessionId)
-
-    return handleDatabaseError(!error, error)
   }
 
   /**
    * 获取面试会话详情
    */
-  static async getInterviewSession(sessionId: string): Promise<DatabaseResult<InterviewSession>> {
-    const { data, error } = await supabase
-      .from('interview_sessions')
-      .select('*')
-      .eq('id', sessionId)
-      .single()
+  static async getInterviewSession(sessionId: string): Promise<InterviewSession | null> {
+    try {
+      const { data, error } = await supabase
+        .from('interview_sessions')
+        .select('*')
+        .eq('id', sessionId)
+        .single()
 
-    if (error) {
-      return handleDatabaseError(null, error)
+      if (error || !data) return null
+      return data
+    } catch (error) {
+      console.error('Error getting interview session:', error)
+      return null
     }
-
-    const session: InterviewSession = {
-      id: data.id,
-      userId: data.user_id,
-      type: data.type as SessionType,
-      jobTitle: data.job_title || undefined,
-      companyName: data.company_name || undefined,
-      questions: data.questions as Array<InterviewQuestion>,
-      responses: data.responses as any || [],
-      status: data.status as any,
-      startedAt: data.started_at,
-      completedAt: data.completed_at || undefined,
-      totalDuration: data.total_duration || undefined,
-      overallScore: data.overall_score ? Number(data.overall_score) : undefined,
-      feedback: data.feedback as any || undefined,
-    }
-
-    return handleDatabaseError(session, null)
   }
 
   /**
-   * 获取用户的面试会话列表
+   * 删除面试会话
    */
-  static async getUserInterviewSessions(
-    userId: string,
-    limit: number = 20
-  ): Promise<DatabaseResult<Array<InterviewSession>>> {
-    const { data, error } = await supabase
-      .from('interview_sessions')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false })
-      .limit(limit)
+  static async deleteInterviewSession(sessionId: string): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('interview_sessions')
+        .delete()
+        .eq('id', sessionId)
 
-    if (error) {
-      return handleDatabaseError(null, error)
+      if (error) {
+        console.error('Error deleting interview session:', error)
+        return false
+      }
+      return true
+    } catch (error) {
+      console.error('Error deleting interview session:', error)
+      return false
     }
-
-    const sessions: Array<InterviewSession> = (data || []).map(item => ({
-      id: item.id,
-      userId: item.user_id,
-      type: item.type as SessionType,
-      jobTitle: item.job_title || undefined,
-      companyName: item.company_name || undefined,
-      questions: item.questions as Array<InterviewQuestion>,
-      responses: item.responses as any || [],
-      status: item.status as any,
-      startedAt: item.started_at,
-      completedAt: item.completed_at || undefined,
-      totalDuration: item.total_duration || undefined,
-      overallScore: item.overall_score ? Number(item.overall_score) : undefined,
-      feedback: item.feedback as any || undefined,
-    }))
-
-    return handleDatabaseError(sessions, null)
   }
 
   /**
-   * 记录真实面试经历
+   * 获取用户的面试记录
    */
-  static async recordRealInterview(
-    userId: string,
-    interviewData: Omit<RealInterviewRecord, 'id' | 'userId' | 'createdAt' | 'updatedAt'>
-  ): Promise<DatabaseResult<RealInterviewRecord>> {
-    const recordData: InterviewRecordInsert = {
-      user_id: userId,
-      job_title: interviewData.jobApplication.jobTitle,
-      company_name: interviewData.jobApplication.companyName,
-      interview_date: interviewData.interviewDetails.date,
-      interview_type: interviewData.interviewDetails.format,
-      questions: interviewData.actualQuestions || [],
-      feedback: interviewData.feedback.overallExperience?.toString(),
-      result: interviewData.outcome.result,
-      follow_up_actions: interviewData.followUp.questionsAsked || [],
+  static async getUserInterviewLogs(userId: string): Promise<Array<InterviewLog>> {
+    try {
+      const { data, error } = await supabase
+        .from('interview_logs')
+        .select('*')
+        .eq('user_id', userId)
+        .order('interview_date', { ascending: false })
+
+      if (error || !data) return []
+      return data
+    } catch (error) {
+      console.error('Error getting user interview logs:', error)
+      return []
     }
-
-    const { data, error } = await supabase
-      .from('interview_records')
-      .insert(recordData)
-      .select()
-      .single()
-
-    if (error) {
-      return handleDatabaseError(null, error)
-    }
-
-    // 转换为业务类型
-    const record: RealInterviewRecord = {
-      id: data.id,
-      userId: data.user_id,
-      jobApplication: {
-        jobTitle: data.job_title,
-        companyName: data.company_name,
-        applicationDate: data.created_at,
-      },
-      interviewDetails: {
-        date: data.interview_date,
-        time: '',
-        duration: 0,
-        format: data.interview_type as any,
-        interviewers: [],
-        rounds: 1,
-        currentRound: 1,
-      },
-      preparation: {
-        researchTime: 0,
-        practiceSession: [],
-        reviewedQuestions: [],
-        preparedQuestions: [],
-        confidence: 3,
-      },
-      actualQuestions: data.questions as any || [],
-      outcome: {
-        result: data.result as any,
-        feedback: data.feedback || undefined,
-      },
-      feedback: {
-        strengths: [],
-        weaknesses: [],
-        surprisingQuestions: [],
-        overallExperience: Number(data.feedback) || 3,
-        interviewerProfessionalism: 3,
-        companyImpression: 3,
-        likelihood: 3,
-      },
-      followUp: {
-        thankYouSent: false,
-        questionsAsked: data.follow_up_actions || [],
-      },
-      createdAt: data.created_at,
-      updatedAt: data.updated_at,
-    }
-
-    return handleDatabaseError(record, null)
   }
 
   /**
-   * 获取用户的面试分析数据
+   * 创建面试记录
    */
-  static async getInterviewAnalytics(
-    request: InterviewAnalyticsRequest
-  ): Promise<DatabaseResult<InterviewAnalytics>> {
-    const userId = request.userId
+  static async createInterviewLog(input: CreateInterviewLogInput): Promise<InterviewLog | null> {
+    try {
+      const { data, error } = await supabase
+        .from('interview_logs')
+        .insert([{
+          user_id: input.user_id,
+          company: input.company,
+          position: input.position,
+          interview_date: input.interview_date,
+          stage: input.stage,
+          result: input.result,
+          feedback: input.feedback,
+          notes: input.notes
+        }])
+        .select()
+        .single()
 
-    // 获取面试会话统计
-    const { data: sessions } = await supabase
-      .from('interview_sessions')
-      .select('*')
-      .eq('user_id', userId)
-
-    // 获取真实面试记录
-    const { data: realInterviews } = await supabase
-      .from('interview_records')
-      .select('*')
-      .eq('user_id', userId)
-
-    const completedSessions = (sessions || []).filter(s => s.status === 'completed')
-    const totalInterviews = (realInterviews || []).length
-    const passedInterviews = (realInterviews || []).filter(i => i.result === 'passed').length
-    const successRate = totalInterviews > 0 ? passedInterviews / totalInterviews : 0
-
-    // 计算平均准备时间（模拟数据）
-    const averagePreparationTime = completedSessions.length > 0 ? 
-      completedSessions.reduce((sum, s) => sum + (s.total_duration || 0), 0) / completedSessions.length / 3600 : 0
-
-    const analytics: InterviewAnalytics = {
-      totalInterviews: totalInterviews,
-      successRate: successRate,
-      averagePreparationTime: averagePreparationTime,
-      strongestCategories: await this.calculateStrongestCategories(completedSessions),
-      improvementAreas: await this.calculateImprovementAreas(completedSessions),
-      progressTrend: await this.calculateProgressTrend(completedSessions),
-      companyTypePerformance: [],
+      if (error || !data) {
+        console.error('Error creating interview log:', error)
+        return null
+      }
+      return data
+    } catch (error) {
+      console.error('Error creating interview log:', error)
+      return null
     }
-
-    return handleDatabaseError(analytics, null)
   }
 
   /**
-   * 计算总体得分
+   * 更新面试记录
    */
-  private static calculateOverallScore(responses: Array<any>): number {
-    if (!responses || responses.length === 0) return 0
-    
-    // 简化的评分逻辑：基于回答时长和信心度
-    const avgConfidence = responses.reduce((sum, r) => sum + (r.confidence || 3), 0) / responses.length
-    const avgTimeScore = responses.reduce((sum, r) => {
-      const duration = r.duration || 60
-      // 理想回答时间60-120秒，给予最高分
-      const timeScore = duration >= 60 && duration <= 120 ? 5 : Math.max(1, 5 - Math.abs(duration - 90) / 30)
-      return sum + timeScore
-    }, 0) / responses.length
+  static async updateInterviewLog(
+    logId: string, 
+    updates: Partial<CreateInterviewLogInput>
+  ): Promise<InterviewLog | null> {
+    try {
+      const { data, error } = await supabase
+        .from('interview_logs')
+        .update(updates)
+        .eq('id', logId)
+        .select()
+        .single()
 
-    return Math.round((avgConfidence + avgTimeScore) / 2 * 20) / 100 // 转换为0-1分制
+      if (error || !data) {
+        console.error('Error updating interview log:', error)
+        return null
+      }
+      return data
+    } catch (error) {
+      console.error('Error updating interview log:', error)
+      return null
+    }
   }
 
   /**
-   * 生成会话反馈
+   * 删除面试记录
    */
-  private static generateSessionFeedback(questions: Array<any>, responses: Array<any>) {
-    return {
-      overallPerformance: {
-        communicationScore: Math.random() * 40 + 60,
-        contentScore: Math.random() * 40 + 60,
-        confidenceScore: Math.random() * 40 + 60,
-        structureScore: Math.random() * 40 + 60,
-        timeManagementScore: Math.random() * 40 + 60,
-        overallTrend: 'improving' as const,
-      },
-      questionAnalysis: questions.map((q: any, index: number) => ({
-        questionId: q.id,
-        category: q.category,
-        performance: Math.random() > 0.5 ? 'good' : 'average' as const,
-        keyStrengths: ['回答结构清晰'],
-        areasForImprovement: ['可以增加更多具体例子'],
-        timeSpent: responses[index]?.duration || 90,
-      })),
-      recommendations: [
+  static async deleteInterviewLog(logId: string): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('interview_logs')
+        .delete()
+        .eq('id', logId)
+
+      if (error) {
+        console.error('Error deleting interview log:', error)
+        return false
+      }
+      return true
+    } catch (error) {
+      console.error('Error deleting interview log:', error)
+      return false
+    }
+  }
+
+  /**
+   * 获取面试统计数据
+   */
+  static async getInterviewStats(userId: string) {
+    try {
+      const sessions = await this.getUserInterviewSessions(userId)
+      const logs = await this.getUserInterviewLogs(userId)
+
+      const completedSessions = sessions.filter(s => s.completed_at)
+      const avgScore = completedSessions.length > 0 
+        ? completedSessions.reduce((sum, s) => sum + (s.score || 0), 0) / completedSessions.length 
+        : 0
+
+      const passedInterviews = logs.filter(l => l.result === 'passed').length
+      const totalInterviews = logs.filter(l => l.result && l.result !== 'pending').length
+      const successRate = totalInterviews > 0 ? passedInterviews / totalInterviews : 0
+
+      return {
+        total_sessions: sessions.length,
+        completed_sessions: completedSessions.length,
+        average_score: Math.round(avgScore),
+        total_real_interviews: logs.length,
+        success_rate: Math.round(successRate * 100),
+        recent_activity: sessions.slice(0, 5)
+      }
+    } catch (error) {
+      console.error('Error getting interview stats:', error)
+      return {
+        total_sessions: 0,
+        completed_sessions: 0,
+        average_score: 0,
+        total_real_interviews: 0,
+        success_rate: 0,
+        recent_activity: []
+      }
+    }
+  }
+
+  /**
+   * 获取默认面试题目
+   */
+  private static getDefaultQuestions(type: string): Array<InterviewQuestion> {
+    const questionSets = {
+      mock: [
         {
-          category: '沟通技巧',
-          priority: 'medium' as const,
-          suggestion: '建议多练习用STAR方法回答行为问题',
-          actionable: true,
-          resources: [],
+          id: 'mock_1',
+          question: '请简单介绍一下自己',
+          type: 'general' as const,
+          difficulty: 'easy' as const,
+          category: 'self_introduction',
+          expected_duration: 120
         },
-      ],
-      nextSteps: [
         {
-          type: 'practice_more' as const,
-          title: '继续练习',
-          description: '建议再练习5-10道类似问题',
-          priority: 1,
-        },
-      ],
-    }
-  }
-
-  /**
-   * 计算最强分类
-   */
-  private static async calculateStrongestCategories(sessions: Array<any>) {
-    const categoryPerformance: Record<string, { total: number, count: number }> = {}
-    
-    sessions.forEach(session => {
-      const questions = session.questions as Array<any> || []
-      const score = session.overall_score || 0.5
-      
-      questions.forEach((q: any) => {
-        if (!categoryPerformance[q.category]) {
-          categoryPerformance[q.category] = { total: 0, count: 0 }
+          id: 'mock_2',
+          question: '为什么选择我们公司？',
+          type: 'behavioral' as const,
+          difficulty: 'medium' as const,
+          category: 'motivation',
+          expected_duration: 90
         }
-        categoryPerformance[q.category].total += score
-        categoryPerformance[q.category].count += 1
-      })
-    })
-
-    return Object.entries(categoryPerformance).map(([category, data]) => ({
-      category: category as InterviewCategory,
-      averageScore: data.count > 0 ? data.total / data.count : 0,
-      interviewCount: data.count,
-      trend: 'stable' as const,
-    }))
-  }
-
-  /**
-   * 计算改进领域
-   */
-  private static async calculateImprovementAreas(sessions: Array<any>) {
-    return [
-      {
-        area: '技术深度',
-        currentScore: 65,
-        targetScore: 80,
-        actionPlan: ['多做算法练习', '深入学习框架原理'],
-        priority: 1,
-      },
-      {
-        area: '沟通表达',
-        currentScore: 70,
-        targetScore: 85,
-        actionPlan: ['练习STAR方法', '提高语言组织能力'],
-        priority: 2,
-      },
-    ]
-  }
-
-  /**
-   * 计算进度趋势
-   */
-  private static async calculateProgressTrend(sessions: Array<any>) {
-    const dataPoints = sessions.slice(0, 10).map((session, index) => ({
-      date: session.completed_at || session.created_at,
-      score: (session.overall_score || 0.5) * 100,
-      interviewCount: 1,
-    }))
-
-    return {
-      timeframe: 'month' as const,
-      dataPoints,
-      overallTrend: 'up' as const,
+      ],
+      technical: [
+        {
+          id: 'tech_1',
+          question: '请解释一下JavaScript的闭包概念',
+          type: 'technical' as const,
+          difficulty: 'medium' as const,
+          category: 'javascript',
+          expected_duration: 180,
+          keywords: ['javascript', 'closure', 'scope']
+        },
+        {
+          id: 'tech_2',
+          question: '如何优化React应用的性能？',
+          type: 'technical' as const,
+          difficulty: 'hard' as const,
+          category: 'react',
+          expected_duration: 240,
+          keywords: ['react', 'performance', 'optimization']
+        }
+      ],
+      behavioral: [
+        {
+          id: 'beh_1',
+          question: '描述一次你在团队中解决冲突的经历',
+          type: 'behavioral' as const,
+          difficulty: 'medium' as const,
+          category: 'teamwork',
+          expected_duration: 180
+        },
+        {
+          id: 'beh_2',
+          question: '谈谈你最大的职业挑战是什么',
+          type: 'behavioral' as const,
+          difficulty: 'medium' as const,
+          category: 'self_reflection',
+          expected_duration: 150
+        }
+      ]
     }
+
+    return questionSets[type as keyof typeof questionSets] || questionSets.mock
+  }
+
+  /**
+   * 生成面试反馈（预留AI接口）
+   */
+  private static async generateFeedback(
+    sessionId: string, 
+    answers: Array<InterviewAnswer>
+  ): Promise<InterviewFeedback> {
+    try {
+      // 这里将来可以集成AI服务进行智能评估
+      // 现在提供基础的评估逻辑
+
+      const questionScores: Record<string, number> = {}
+      const strengths: Array<string> = []
+      const improvements: Array<string> = []
+
+      // 基础评分逻辑
+      answers.forEach(answer => {
+        const answerLength = answer.answer.length
+        const duration = answer.duration || 60
+        
+        // 基于回答长度和时间的简单评分
+        let score = 60 // 基础分
+        
+        if (answerLength > 100) score += 20
+        if (answerLength > 200) score += 10
+        if (duration >= 60 && duration <= 180) score += 10
+        
+        questionScores[answer.question_id] = Math.min(score, 100)
+      })
+
+      // 生成建议
+      const avgScore = Object.values(questionScores).reduce((a, b) => a + b, 0) / Object.keys(questionScores).length
+
+      if (avgScore >= 80) {
+        strengths.push('回答完整详细')
+        strengths.push('表达清晰')
+      } else {
+        improvements.push('可以提供更多具体例子')
+        improvements.push('注意控制回答时间')
+      }
+
+      return {
+        overall_score: Math.round(avgScore),
+        question_scores: questionScores,
+        strengths,
+        areas_for_improvement: improvements,
+        detailed_feedback: {
+          communication: avgScore >= 75 ? 'good' : 'needs_improvement',
+          content_quality: avgScore >= 80 ? 'excellent' : 'average',
+          time_management: 'good'
+        },
+        suggestions: [
+          '继续练习STAR方法',
+          '准备更多具体的项目案例',
+          '加强对公司和岗位的了解'
+        ]
+      }
+    } catch (error) {
+      console.error('Error generating feedback:', error)
+      return {
+        overall_score: 60,
+        question_scores: {},
+        strengths: [],
+        areas_for_improvement: ['需要更多练习'],
+        detailed_feedback: {},
+        suggestions: ['多练习面试技巧']
+      }
+    }
+  }
+
+  /**
+   * 计算总体评分
+   */
+  private static calculateOverallScore(feedback: InterviewFeedback): number {
+    return feedback.overall_score
   }
 } 

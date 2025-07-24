@@ -1,184 +1,111 @@
-import type { Database } from '../lib/db/types';
+export type GenderType = 'male' | 'female' | 'other';
+export type DegreeType = 'high_school' | 'associate' | 'bachelor' | 'master' | 'doctor';
+export type EmploymentType = 'full_time' | 'part_time' | 'contract' | 'internship' | 'temporary';
+export type SkillLevel = 'beginner' | 'intermediate' | 'advanced' | 'expert';
+export type ExperienceLevel = 'entry' | 'junior' | 'mid' | 'senior' | 'lead' | 'executive';
+export type CompanySize = 'startup' | 'small' | 'medium' | 'large' | 'enterprise';
+export type ApplicationStatus = 'saved' | 'draft' | 'submitted' | 'under_review' | 'phone_screen' | 'interview' | 'final_interview' | 'offer' | 'accepted' | 'rejected' | 'withdrawn';
 
-// 数据库表类型别名
-export type UserProfile = Database['public']['Tables']['user_profiles']['Row'];
-export type UserProfileInsert = Database['public']['Tables']['user_profiles']['Insert'];
-export type UserProfileUpdate = Database['public']['Tables']['user_profiles']['Update'];
 
-/**
- * 用户基础信息接口
- */
-export interface UserBasicInfo {
+export interface Location {
+  city?: string;
+  province?: string;
+  country?: string;
+}
+
+export interface SalaryRange {
+  min: number;
+  max: number;
+  currency: string;
+}
+
+export interface UserProfile {
+  id: string; // UUID, references auth.users(id)
   email: string;
-  fullName: string | null;
-  age: number | null;
-  gender: 'male' | 'female' | 'other' | null;
-  location: string | null;
-  phone: string | null;
-  avatarUrl: string | null;
-  bio: string | null;
+  name: string;
+  avatar?: string;
+  phone?: string;
+  birth_date?: string; // Date
+  gender?: GenderType;
+  location?: Location;
+  bio?: string;
+  created_at: string; // timestamp with time zone
+  updated_at: string; // timestamp with time zone
 }
 
-/**
- * 教育背景信息
- */
-export interface EducationInfo {
-  educationLevel: 'high_school' | 'associate' | 'bachelor' | 'master' | 'phd' | null;
-  major: string | null;
-  graduationYear: number | null;
-  institution: string | null;
-  gpa: number | null;
+export interface Education {
+  id: string; // UUID
+  user_id: string; // UUID
+  school: string;
+  major: string;
+  degree: DegreeType;
+  start_date: string; // Date
+  end_date?: string; // Date
+  is_current?: boolean;
+  gpa?: number;
+  description?: string;
+  created_at: string;
+  updated_at: string;
 }
 
-/**
- * 工作经历信息
- */
 export interface WorkExperience {
-  id: string;
-  companyName: string;
+  id: string; // UUID
+  user_id: string; // UUID
+  company: string;
   position: string;
-  startDate: string;
-  endDate: string | null; // null 表示当前工作
-  description: string | null;
-  skills: Array<string>;
-  achievements: Array<string>;
+  department?: string;
+  employment_type: EmploymentType;
+  start_date: string; // Date
+  end_date?: string; // Date
+  is_current?: boolean;
+  location?: string;
+  description?: string;
+  achievements?: Array<string>;
+  skills_used?: Array<string>;
+  created_at: string;
+  updated_at: string;
 }
 
-/**
- * 项目经历信息
- */
-export interface ProjectExperience {
-  id: string;
-  projectName: string;
+export interface Skill {
+  id: string; // UUID
+  user_id: string; // UUID
+  name: string;
+  category: string;
+  level: SkillLevel;
+  years_experience?: number;
+  verified?: boolean;
+  description?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Language {
+  id: string; // UUID
+  user_id: string; // UUID
+  language: string;
+  proficiency: string;
+  reading_level?: string;
+  writing_level?: string;
+  speaking_level?: string;
+  certification?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Project {
+  id: string; // UUID
+  user_id: string; // UUID
+  name: string;
   description: string;
   role: string;
-  startDate: string;
-  endDate: string | null;
-  technologies: Array<string>;
-  achievements: Array<string>;
-  projectUrl: string | null;
-  githubUrl: string | null;
-}
-
-/**
- * 求职偏好设置
- */
-export interface JobPreferences {
-  preferredJobType: 'full_time' | 'part_time' | 'contract' | 'internship' | null;
-  preferredSalaryMin: number | null;
-  preferredSalaryMax: number | null;
-  preferredLocations: Array<string>;
-  remoteWorkPreference: 'remote_only' | 'hybrid' | 'onsite' | 'no_preference';
-  willingToRelocate: boolean;
-  availableStartDate: string | null;
-  targetIndustries: Array<string>;
-  targetCompanySize: 'startup' | 'small' | 'medium' | 'large' | 'enterprise' | null;
-}
-
-/**
- * 技能评估
- */
-export interface SkillAssessment {
-  skillName: string;
-  category: 'technical' | 'soft' | 'language' | 'certification';
-  proficiencyLevel: 1 | 2 | 3 | 4 | 5; // 1-初学者, 5-专家
-  yearsOfExperience: number | null;
-  lastUsed: string | null; // 最后使用时间
-  certifications: Array<string>;
-}
-
-/**
- * 兴趣爱好
- */
-export interface Interest {
-  name: string;
-  category: 'professional' | 'personal' | 'hobby';
-  description: string | null;
-}
-
-/**
- * 完整用户画像（组合类型）
- */
-export interface CompleteUserProfile {
-  basicInfo: UserBasicInfo;
-  education: EducationInfo;
-  workExperiences: Array<WorkExperience>;
-  projectExperiences: Array<ProjectExperience>;
-  jobPreferences: JobPreferences;
-  skills: Array<SkillAssessment>;
-  interests: Array<Interest>;
-  linkedinUrl: string | null;
-  githubUrl: string | null;
-  portfolioUrl: string | null;
-  resumeUrl: string | null;
-  profileCompleteness: number; // 0-100, 画像完整度
-  lastUpdated: string;
-}
-
-/**
- * 用户状态
- */
-export interface UserStatus {
-  isActive: boolean;
-  lastLoginAt: string | null;
-  profileSetupCompleted: boolean;
-  assessmentCompleted: boolean;
-  jobSearchActive: boolean;
-  notificationPreferences: {
-    email: boolean;
-    push: boolean;
-    sms: boolean;
-    jobRecommendations: boolean;
-    interviewReminders: boolean;
-    applicationUpdates: boolean;
-  };
-}
-
-/**
- * API 响应格式
- */
-export interface UserApiResponse<T = any> {
-  success: boolean;
-  data: T | null;
-  error: string | null;
-  message: string | null;
-}
-
-/**
- * 分页查询参数
- */
-export interface PaginationParams {
-  page: number;
-  limit: number;
-  sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
-}
-
-/**
- * 用户搜索/筛选参数
- */
-export interface UserSearchParams extends PaginationParams {
-  email?: string;
-  location?: string;
-  educationLevel?: string;
-  experienceRange?: {
-    min: number;
-    max: number;
-  };
-  skills?: Array<string>;
-  createdAfter?: string;
-  createdBefore?: string;
-}
-
-/**
- * 用户统计信息
- */
-export interface UserStats {
-  totalUsers: number;
-  activeUsers: number;
-  profileCompletionRate: number;
-  assessmentCompletionRate: number;
-  averageExperienceYears: number;
-  topSkills: Array<{ skill: string; count: number }>;
-  locationDistribution: Array<{ location: string; count: number }>;
+  start_date: string; // Date
+  end_date?: string; // Date
+  is_current?: boolean;
+  technologies?: Array<string>;
+  url?: string;
+  repository_url?: string;
+  achievements?: Array<string>;
+  team_size?: number;
+  created_at: string;
+  updated_at: string;
 } 
