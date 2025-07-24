@@ -17,13 +17,15 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseKey, {
 })
 
 // 服务端客户端（使用service role key）
-export const supabaseAdmin = createClient<Database>(
+const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+export const supabaseAdmin = serviceRoleKey ? createClient<Database>(
   supabaseUrl,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  serviceRoleKey,
   {
     auth: {
       autoRefreshToken: false,
       persistSession: false
     }
   }
-) 
+) : null 

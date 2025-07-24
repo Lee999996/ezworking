@@ -2,97 +2,97 @@
 
 ## Introduction
 
-The Career Positioning feature is the core functionality of EzWorking that addresses the primary pain point: "Job seekers don't know what positions they are suitable for." Through AI-driven multi-dimensional career assessment and intelligent analysis, this feature helps job seekers clarify their career positioning and find the most suitable job directions.
+The Career Positioning feature integrates AI-driven career guidance into a ChatGPT-like conversational interface. Users engage in natural dialogue with an AI assistant that can dynamically render interactive components (forms, assessments, analysis displays) within chat messages when needed for career positioning analysis. The system maintains conversational flow while providing structured data collection and analysis capabilities.
 
 ## Requirements
 
 ### Requirement 1
 
-**User Story:** As a job seeker, I want to provide my personal and professional information through a structured form, so that the system can understand my background and preferences.
+**User Story:** As a job seeker, I want to chat with an AI assistant about my career concerns, so that I can get personalized guidance through natural conversation.
 
 #### Acceptance Criteria
 
-1. WHEN a user accesses the career positioning feature THEN the system SHALL display a comprehensive information collection form
-2. WHEN a user fills out the form THEN the system SHALL collect the following required information: age, gender, current location, acceptable locations, education level, school, major, professional skills, knowledge areas, work/internship experience
-3. WHEN a user fills out the form THEN the system SHALL optionally collect: MBTI personality type and interests/hobbies
-4. WHEN a user submits the form THEN the system SHALL validate all required fields are completed
-5. WHEN form validation passes THEN the system SHALL save the structured data to the user_profile table
-6. WHEN user profile data is saved THEN the system SHALL maintain this information in the AI agent's memory for future reference
+1. WHEN I access the career positioning page THEN I SHALL see a ChatGPT-like interface with message history and input field
+2. WHEN I type a message THEN the AI SHALL respond conversationally and maintain chat history
+3. WHEN I mention career positioning, job suitability, or career guidance THEN the AI SHALL recognize the intent and offer specialized help
+4. WHEN the AI offers career positioning analysis THEN it SHALL explain the process and ask for my consent to proceed
+5. WHEN I agree to career analysis THEN the AI SHALL begin the structured career positioning flow while maintaining conversational tone
+6. WHEN the career positioning process is complete THEN I SHALL be able to continue chatting about other topics or ask follow-up questions
 
 ### Requirement 2
 
-**User Story:** As a job seeker, I want to take an intelligent assessment test, so that the system can better understand my personality and career preferences.
+**User Story:** As a job seeker, I want the AI to collect my profile information through dynamic forms embedded in our conversation, so that the data collection feels natural and integrated.
 
 #### Acceptance Criteria
 
-1. WHEN a user completes the information form THEN the system SHALL generate 15-20 assessment questions
-2. WHEN generating questions THEN the system SHALL include both personality assessment and career personality assessment questions
-3. WHEN a user is taking the assessment THEN the system SHALL present questions one at a time with clear answer options
-4. WHEN a user completes all assessment questions THEN the system SHALL calculate and store the assessment results
-5. WHEN assessment is completed THEN the system SHALL proceed to profile analysis phase
+1. WHEN the AI needs to collect structured profile data THEN it SHALL render an interactive form component within a chat message
+2. WHEN the profile form is displayed THEN it SHALL include fields for: basic info (age, gender, location), education (level, school, major), experience (work/internship history), skills (professional skills, knowledge areas)
+3. WHEN I fill out the form THEN the data SHALL be validated in real-time with helpful error messages
+4. WHEN I submit the profile form THEN the AI SHALL acknowledge receipt with a conversational message and proceed to next step
+5. WHEN profile data is incomplete THEN the AI SHALL ask follow-up questions conversationally to gather missing information
+6. WHEN all required profile data is collected THEN the AI SHALL summarize my information and ask for confirmation before proceeding
 
 ### Requirement 3
 
-**User Story:** As a job seeker, I want to receive an AI-generated personality and career profile analysis, so that I can understand my strengths and career tendencies.
+**User Story:** As a job seeker, I want to take a personality and career assessment through interactive components in our chat, so that the AI can better understand my preferences and traits.
 
 #### Acceptance Criteria
 
-1. WHEN assessment results are available THEN the system SHALL generate a comprehensive profile analysis using AI
-2. WHEN generating profile analysis THEN the system SHALL consider both form data and assessment results
-3. WHEN profile analysis is complete THEN the system SHALL maintain this analysis in the AI agent's memory
-4. WHEN profile analysis is generated THEN the system SHALL present the analysis to the user in a clear, understandable format
-5. WHEN user views their profile analysis THEN the system SHALL highlight key personality traits, strengths, and career tendencies
+1. WHEN profile collection is complete THEN the AI SHALL introduce the assessment phase conversationally and render an assessment component in the chat
+2. WHEN the assessment component loads THEN it SHALL display 15-20 questions with multiple choice or rating scale answers
+3. WHEN I answer assessment questions THEN my responses SHALL be saved and progress SHALL be shown within the chat component
+4. WHEN I complete the assessment THEN the AI SHALL thank me conversationally and explain that analysis is being generated
+5. WHEN assessment results are processed THEN the AI SHALL maintain this data for the analysis phase
+6. IF I exit during assessment THEN the AI SHALL save my progress and allow me to resume later
 
 ### Requirement 4
 
-**User Story:** As a job seeker, I want to receive personalized job position recommendations based on my profile, so that I can explore suitable career options.
+**User Story:** As a job seeker, I want to receive my career analysis through interactive displays in our chat conversation, so that I can understand my strengths and career fit in an engaging way.
 
 #### Acceptance Criteria
 
-1. WHEN profile analysis is complete THEN the system SHALL generate initial job position recommendations
-2. WHEN generating recommendations THEN the system SHALL base suggestions on both form data and profile analysis
-3. WHEN presenting recommendations THEN the system SHALL show at least 5 different job positions
-4. WHEN user reviews recommendations THEN the system SHALL allow them to express preferences (like/dislike) for each position
-5. WHEN user provides feedback on recommendations THEN the system SHALL refine and provide additional suggestions
-6. WHEN user shows interest in positions THEN the system SHALL continue recommending until user selects at least 1 position
-7. WHEN user selects 1 position THEN the system SHALL recommend 2 additional related positions but ensure minimum 5 total recommendations
+1. WHEN assessment is complete THEN the AI SHALL render an analysis display component within a chat message
+2. WHEN the analysis component loads THEN it SHALL show my personality profile, strengths analysis, and career tendencies with visual elements
+3. WHEN I view the analysis THEN the AI SHALL explain each section conversationally and invite questions
+4. WHEN I click on analysis sections THEN detailed explanations SHALL expand within the chat component
+5. WHEN I ask questions about my analysis THEN the AI SHALL provide detailed conversational responses referencing the displayed data
+6. WHEN I'm satisfied with the analysis THEN the AI SHALL ask if I want to see job recommendations
 
 ### Requirement 5
 
-**User Story:** As a job seeker, I want to interact with specialized AI agents that collaborate to provide comprehensive career guidance, so that I receive expert-level assistance in different aspects of career positioning.
+**User Story:** As a job seeker, I want to explore job recommendations through interactive components in our chat, so that I can discover and evaluate suitable positions naturally.
 
 #### Acceptance Criteria
 
-1. WHEN a user starts the career positioning process THEN the system SHALL initialize multiple specialized agents: Profile Collector Agent, Assessment Agent, Analysis Agent, and Recommendation Agent
-2. WHEN Profile Collector Agent gathers user data THEN it SHALL structure and validate information before passing to other agents
-3. WHEN Assessment Agent generates questions THEN it SHALL create personalized assessments based on profile data and coordinate with Analysis Agent
-4. WHEN Analysis Agent processes results THEN it SHALL generate comprehensive personality and career profiles using multi-agent collaboration
-5. WHEN Recommendation Agent suggests positions THEN it SHALL coordinate with Analysis Agent to ensure recommendations align with user profile
-6. WHEN agents interact THEN they SHALL maintain shared context and communicate findings through structured inter-agent messaging
-7. WHEN user interacts with the system THEN the appropriate specialized agent SHALL respond while maintaining context from other agents
+1. WHEN analysis review is complete THEN the AI SHALL render a job recommendations component within a chat message
+2. WHEN the recommendations component loads THEN it SHALL display at least 5 job positions with titles, descriptions, fit scores, and reasoning
+3. WHEN I view job recommendations THEN I SHALL be able to mark positions as "interested", "not interested", or "maybe" within the component
+4. WHEN I provide feedback on jobs THEN the AI SHALL acknowledge my preferences conversationally and offer to refine recommendations
+5. WHEN I request refinement THEN the AI SHALL generate new recommendations based on my feedback and display them in a new chat component
+6. WHEN I find satisfactory recommendations THEN the AI SHALL offer to help create a final career direction plan
 
 ### Requirement 6
 
-**User Story:** As a job seeker, I want to finalize my career direction through intelligent agent coordination, so that I have clear and well-reasoned job search targets.
+**User Story:** As a job seeker, I want to finalize my career directions through a summary component in our chat, so that I have clear guidance for my job search.
 
 #### Acceptance Criteria
 
-1. WHEN user completes position preference selection THEN the Recommendation Agent SHALL coordinate with Analysis Agent to synthesize final career directions
-2. WHEN synthesizing career directions THEN agents SHALL collaborate to generate 1-5 directions based on complete multi-agent analysis
-3. WHEN generating final directions THEN agents SHALL consider all collected data: profile, assessment, analysis, and preferences through inter-agent communication
-4. WHEN career directions are finalized THEN the system SHALL present them with reasoning from multiple agent perspectives
-5. WHEN user reviews directions THEN agents SHALL provide collaborative explanations showing how different aspects led to recommendations
-6. WHEN user confirms career direction THEN all agents SHALL update their shared knowledge base for future interactions
+1. WHEN I'm satisfied with job recommendations THEN the AI SHALL render a career directions summary component in the chat
+2. WHEN the career directions component loads THEN it SHALL show 1-3 recommended career paths with detailed explanations and next steps
+3. WHEN I review career directions THEN the AI SHALL explain the reasoning conversationally and offer to answer questions
+4. WHEN I ask about specific career paths THEN the AI SHALL provide detailed guidance on skills needed, job search strategies, and career progression
+5. WHEN career directions are finalized THEN the AI SHALL offer to save this information and provide ongoing career guidance
+6. WHEN the session is complete THEN I SHALL be able to continue chatting about other topics or ask follow-up career questions
 
 ### Requirement 7
 
-**User Story:** As a system administrator, I want the multi-agent system to maintain consistency and coordination, so that users receive coherent and reliable career guidance.
+**User Story:** As a job seeker, I want the chat interface to be responsive and user-friendly, so that I can easily interact with both conversational messages and embedded components.
 
 #### Acceptance Criteria
 
-1. WHEN agents communicate THEN the system SHALL ensure message passing follows defined protocols and data structures
-2. WHEN agents share context THEN the system SHALL maintain data consistency across all agent memories
-3. WHEN multiple agents process user data THEN the system SHALL coordinate to prevent conflicts and ensure coherent responses
-4. WHEN an agent completes its task THEN it SHALL properly hand off context to the next agent in the workflow
-5. WHEN system encounters errors THEN agents SHALL coordinate recovery and maintain user session continuity
-6. WHEN user session ends THEN all agents SHALL persist their knowledge to shared storage for future sessions
+1. WHEN I use the chat interface THEN it SHALL be responsive and work well on desktop and mobile devices
+2. WHEN messages are sent THEN they SHALL appear immediately with proper loading states for AI responses
+3. WHEN interactive components are rendered THEN they SHALL be clearly distinguished from regular chat messages with appropriate styling
+4. WHEN I interact with embedded components THEN the interface SHALL provide immediate feedback and smooth transitions
+5. WHEN the chat history grows long THEN I SHALL be able to scroll through previous messages while maintaining context
+6. WHEN I refresh the page THEN my chat history and current session state SHALL be preserved

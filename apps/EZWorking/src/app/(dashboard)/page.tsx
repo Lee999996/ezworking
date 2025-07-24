@@ -9,7 +9,6 @@ import {
   Container,
   Textarea,
   HStack,
-  Spacer,
 } from '@chakra-ui/react'
 import { FiArrowUp, FiPaperclip } from 'react-icons/fi'
 

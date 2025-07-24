@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Career Positioning feature implements a Multi-Agent system architecture using CAMEL.AI framework where specialized AI agents collaborate to provide comprehensive career guidance. The system consists of a React + Next.js frontend with Supabase backend, integrated with four primary CAMEL agents that work together through structured communication protocols to deliver personalized career positioning recommendations.
+The Career Positioning feature is built as a ChatGPT-like conversational interface where users engage in natural dialogue with an AI assistant. The system dynamically renders interactive components (forms, assessments, analysis displays) within chat messages when career positioning analysis is needed. The architecture prioritizes conversational flow while providing structured data collection and intelligent career guidance capabilities.
 
 ## Architecture
 
@@ -11,146 +11,173 @@ The Career Positioning feature implements a Multi-Agent system architecture usin
 ```mermaid
 graph TB
     subgraph "Frontend Layer"
-        UI[React + Next.js UI]
-        Components[React Components]
-        State[State Management]
+        ChatInterface[ChatGPT-like Interface]
+        MessageList[Message History]
+        InputField[Message Input]
+        InteractiveComponents[Dynamic Form Components]
+    end
+    
+    subgraph "AI Processing Layer"
+        ConversationalAI[Conversational AI Engine]
+        IntentRecognition[Career Intent Recognition]
+        ComponentRenderer[Dynamic Component Renderer]
+        ContextManager[Conversation Context Manager]
     end
     
     subgraph "Backend Layer"
-        API[Next.js API Routes]
-        Auth[Supabase Auth]
-        DB[(Supabase Database)]
+        ChatAPI[Chat API Routes]
+        CareerAPI[Career Analysis API]
+        RealtimeUpdates[WebSocket/SSE Updates]
+        Database[(Supabase Database)]
     end
     
-    subgraph "CAMEL.AI Agent Layer"
-        Orchestrator[CAMEL Agent Orchestrator]
-        ProfileAgent[Profile Collector Agent]
-        AssessmentAgent[Assessment Agent]
-        AnalysisAgent[Analysis Agent]
-        RecommendationAgent[Recommendation Agent]
-    end
-    
-    UI --> API
-    API --> Auth
-    API --> DB
-    API --> Orchestrator
-    
-    Orchestrator --> ProfileAgent
-    Orchestrator --> AssessmentAgent
-    Orchestrator --> AnalysisAgent
-    Orchestrator --> RecommendationAgent
-    
-    ProfileAgent --> DB
-    AssessmentAgent --> DB
-    AnalysisAgent --> DB
-    RecommendationAgent --> DB
+    ChatInterface --> MessageList
+    ChatInterface --> InputField
+    MessageList --> InteractiveComponents
+    InputField --> ConversationalAI
+    ConversationalAI --> IntentRecognition
+    IntentRecognition --> ComponentRenderer
+    ComponentRenderer --> InteractiveComponents
+    ConversationalAI --> ContextManager
+    ConversationalAI --> ChatAPI
+    ChatAPI --> CareerAPI
+    CareerAPI --> Database
+    RealtimeUpdates --> ChatInterface
 ```
 
 ### Technology Stack
 
-- **Frontend**: React 18+ with Next.js 14+ (App Router)
+- **Frontend**: React + Next.js with ChatGPT-like interface using Chakra UI
+- **Chat System**: Real-time messaging with WebSocket/Server-Sent Events
+- **AI Integration**: OpenAI API or similar for conversational AI
 - **Backend**: Next.js API Routes with Supabase
-- **Database**: Supabase (PostgreSQL)
+- **Database**: Supabase (PostgreSQL) for chat history and career data
 - **Authentication**: Supabase Auth
-- **AI Agents**: CAMEL.AI Framework
-- **Real-time**: Supabase Realtime (for agent status updates)
-- **Styling**: Tailwind CSS (based on existing codebase pattern)
+- **Real-time**: Supabase Realtime for live chat updates
+- **Styling**: Chakra UI for consistent design system
 
 ### System Communication Flow
 
 ```mermaid
 sequenceDiagram
-    participant U as User (React UI)
-    participant API as Next.js API
-    participant DB as Supabase DB
-    participant O as CAMEL Orchestrator
-    participant PC as Profile Collector Agent
-    participant AS as Assessment Agent
-    participant AN as Analysis Agent
-    participant RC as Recommendation Agent
+    participant U as User
+    participant Chat as Chat Interface
+    participant AI as Conversational AI
+    participant API as Backend API
+    participant DB as Database
 
-    U->>API: Start Career Positioning
-    API->>DB: Create Session Record
-    API->>O: Initialize CAMEL Agents
-    O->>PC: Initialize Profile Collection
+    U->>Chat: Send Message
+    Chat->>AI: Process Message
+    AI->>AI: Analyze Intent
     
-    U->>API: Submit Profile Form
-    API->>DB: Store Profile Data
-    API->>PC: Process Profile Data
-    PC->>PC: Validate & Structure Data
-    PC->>O: Profile Processing Complete
-    
-    O->>AS: Generate Assessment Questions
-    AS->>AS: Create Personalized Questions
-    AS->>API: Return Questions
-    API->>U: Present Assessment Questions
-    
-    U->>API: Submit Assessment Answers
-    API->>DB: Store Assessment Results
-    API->>AS: Process Assessment Results
-    AS->>AS: Score & Interpret Results
-    AS->>O: Assessment Analysis Complete
-    
-    O->>AN: Perform Career Analysis
-    AN->>DB: Retrieve All User Data
-    AN->>AN: Generate Career Profile
-    AN->>DB: Store Analysis Results
-    AN->>O: Analysis Complete
-    
-    O->>RC: Generate Job Recommendations
-    RC->>DB: Retrieve Career Analysis
-    RC->>RC: Generate Recommendations
-    RC->>API: Return Recommendations
-    API->>U: Present Job Recommendations
-    
-    U->>API: Provide Feedback on Jobs
-    API->>RC: Process User Preferences
-    RC->>RC: Refine Recommendations
-    RC->>DB: Store Final Career Directions
-    RC->>API: Return Final Directions
-    API->>U: Present Career Directions
+    alt Regular Conversation
+        AI->>Chat: Return Text Response
+        Chat->>U: Display Message
+    else Career Positioning Intent
+        AI->>API: Initialize Career Session
+        API->>DB: Create Session Record
+        AI->>Chat: Return Message + Profile Form Component
+        Chat->>U: Display Message with Form
+        
+        U->>Chat: Submit Profile Form
+        Chat->>API: Send Profile Data
+        API->>DB: Store Profile Data
+        API->>AI: Process Profile
+        AI->>Chat: Return Message + Assessment Component
+        Chat->>U: Display Assessment
+        
+        U->>Chat: Complete Assessment
+        Chat->>API: Send Assessment Data
+        API->>DB: Store Assessment Results
+        API->>AI: Generate Analysis
+        AI->>Chat: Return Message + Analysis Component
+        Chat->>U: Display Analysis
+        
+        U->>Chat: Request Recommendations
+        Chat->>API: Generate Recommendations
+        API->>AI: Create Job Matches
+        AI->>Chat: Return Message + Recommendations Component
+        Chat->>U: Display Job Recommendations
+        
+        U->>Chat: Provide Feedback
+        Chat->>API: Process Preferences
+        API->>AI: Refine Recommendations
+        AI->>Chat: Return Final Career Directions
+        Chat->>U: Display Career Plan
+    end
 ```
 
 ## Components and Interfaces
 
 ### Frontend Components (React + Next.js)
 
-#### 1. Career Positioning Pages
+#### 1. Chat Interface Components
 ```typescript
-// app/(dashboard)/[workspace]/(app)/career-positioning/page.tsx
-interface CareerPositioningPage {
+// Main chat interface
+interface ChatInterface {
+  messages: ChatMessage[]
+  onSendMessage: (message: string) => void
+  isLoading: boolean
   userId: string
-  workspaceId: string
 }
 
-// Components structure
-interface CareerPositioningComponents {
-  ProfileForm: React.FC<ProfileFormProps>
-  AssessmentQuiz: React.FC<AssessmentQuizProps>
-  ProfileAnalysis: React.FC<ProfileAnalysisProps>
-  JobRecommendations: React.FC<JobRecommendationsProps>
-  CareerDirections: React.FC<CareerDirectionsProps>
+// Chat message types
+interface ChatMessage {
+  id: string
+  type: 'user' | 'assistant' | 'component'
+  content: string
+  component?: ComponentType
+  timestamp: Date
+  userId: string
+}
+
+// Dynamic component types
+type ComponentType = 
+  | 'profile-form'
+  | 'assessment-quiz' 
+  | 'analysis-display'
+  | 'job-recommendations'
+  | 'career-directions'
+
+// Interactive components that render within chat messages
+interface InteractiveComponents {
+  ProfileFormComponent: React.FC<ProfileFormProps>
+  AssessmentComponent: React.FC<AssessmentProps>
+  AnalysisComponent: React.FC<AnalysisProps>
+  RecommendationsComponent: React.FC<RecommendationsProps>
+  CareerDirectionsComponent: React.FC<CareerDirectionsProps>
 }
 ```
 
 #### 2. API Routes (Next.js)
 ```typescript
-// app/api/career-positioning/route.ts
-interface CareerPositioningAPI {
-  POST: (request: Request) => Promise<Response> // Initialize session
-  GET: (request: Request) => Promise<Response>  // Get session status
+// app/api/chat/route.ts
+interface ChatAPI {
+  POST: (request: Request) => Promise<Response> // Send message
+  GET: (request: Request) => Promise<Response>  // Get chat history
 }
 
-// app/api/career-positioning/profile/route.ts
-interface ProfileAPI {
+// app/api/chat/stream/route.ts
+interface StreamingChatAPI {
+  POST: (request: Request) => Promise<Response> // Streaming responses
+}
+
+// app/api/career/profile/route.ts
+interface CareerProfileAPI {
   POST: (request: Request) => Promise<Response> // Submit profile data
-  PUT: (request: Request) => Promise<Response>  // Update profile
+  GET: (request: Request) => Promise<Response>  // Get profile data
 }
 
-// app/api/career-positioning/assessment/route.ts
+// app/api/career/assessment/route.ts
 interface AssessmentAPI {
-  GET: (request: Request) => Promise<Response>  // Get questions
-  POST: (request: Request) => Promise<Response> // Submit answers
+  POST: (request: Request) => Promise<Response> // Submit assessment
+  GET: (request: Request) => Promise<Response>  // Get assessment results
+}
+
+// app/api/career/analysis/route.ts
+interface AnalysisAPI {
+  POST: (request: Request) => Promise<Response> // Generate analysis
+  GET: (request: Request) => Promise<Response>  // Get analysis results
 }
 ```
 
@@ -158,15 +185,52 @@ interface AssessmentAPI {
 
 #### 1. Database Schema
 ```sql
--- User profiles table
-CREATE TABLE user_profiles (
+-- Chat conversations table
+CREATE TABLE chat_conversations (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id),
+  title TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Chat messages table
+CREATE TABLE chat_messages (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  conversation_id UUID REFERENCES chat_conversations(id),
+  user_id UUID REFERENCES auth.users(id),
+  type TEXT CHECK (type IN ('user', 'assistant', 'component')),
+  content TEXT,
+  component_type TEXT,
+  component_data JSONB,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Career positioning sessions table
+CREATE TABLE career_sessions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id),
+  conversation_id UUID REFERENCES chat_conversations(id),
+  status TEXT DEFAULT 'active',
+  current_phase TEXT,
+  profile_data JSONB,
+  assessment_data JSONB,
+  analysis_data JSONB,
+  recommendations_data JSONB,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- User career profiles table
+CREATE TABLE user_career_profiles (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id),
+  session_id UUID REFERENCES career_sessions(id),
   basic_info JSONB,
   education JSONB,
   experience JSONB,
   skills JSONB,
-  optional_info JSONB,
+  preferences JSONB,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -175,10 +239,11 @@ CREATE TABLE user_profiles (
 CREATE TABLE assessment_results (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id),
-  session_id UUID,
+  session_id UUID REFERENCES career_sessions(id),
   questions JSONB,
   answers JSONB,
   scores JSONB,
+  personality_profile JSONB,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
@@ -186,10 +251,11 @@ CREATE TABLE assessment_results (
 CREATE TABLE career_analysis (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id),
-  session_id UUID,
+  session_id UUID REFERENCES career_sessions(id),
   personality_analysis JSONB,
   strengths_analysis JSONB,
   career_tendencies JSONB,
+  job_fit_analysis JSONB,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
@@ -197,203 +263,80 @@ CREATE TABLE career_analysis (
 CREATE TABLE job_recommendations (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id),
-  session_id UUID,
-  recommendations JSONB,
-  user_preferences JSONB,
-  final_directions JSONB,
+  session_id UUID REFERENCES career_sessions(id),
+  initial_recommendations JSONB,
+  user_feedback JSONB,
+  refined_recommendations JSONB,
+  final_career_directions JSONB,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 ```
 
-### CAMEL.AI Agent Integration
+### AI Integration and Processing
 
-#### 1. Agent Orchestrator (CAMEL.AI)
+#### 1. Conversational AI Engine
 
-**Purpose:** Coordinates CAMEL agent workflow and manages system state
+**Purpose:** Handle natural language conversation and intent recognition
 
 **Implementation:**
-```python
-from camel.agents import ChatAgent
-from camel.societies import RolePlaying
-from camel.messages import BaseMessage
-
-class CareerPositioningOrchestrator:
-    def __init__(self):
-        self.agents = {
-            'profile_collector': self._create_profile_agent(),
-            'assessment': self._create_assessment_agent(),
-            'analysis': self._create_analysis_agent(),
-            'recommendation': self._create_recommendation_agent()
-        }
-    
-    def initialize_session(self, user_id: str) -> dict:
-        # Initialize CAMEL agents for user session
-        pass
-    
-    def route_request(self, request: dict) -> dict:
-        # Route to appropriate CAMEL agent
-        pass
-```
-
-**Interface:**
 ```typescript
-interface AgentOrchestrator {
-  initializeSession(userId: string): Promise<SessionContext>
-  routeRequest(request: UserRequest): Promise<AgentResponse>
-  handleAgentTransition(fromAgent: AgentType, toAgent: AgentType): Promise<void>
-  getSessionStatus(sessionId: string): SessionStatus
+// AI service for conversational responses
+interface ConversationalAI {
+  processMessage(message: string, context: ConversationContext): Promise<AIResponse>
+  recognizeCareerIntent(message: string): Promise<CareerIntent>
+  generateResponse(intent: Intent, context: Context): Promise<string>
+  maintainContext(conversationId: string, newContext: Context): Promise<void>
+}
+
+// AI response with potential component rendering
+interface AIResponse {
+  message: string
+  shouldRenderComponent?: boolean
+  componentType?: ComponentType
+  componentData?: any
+  conversationContext: ConversationContext
 }
 ```
 
-### 2. Profile Collector Agent (CAMEL.AI)
+#### 2. Career Analysis Engine
 
-**Purpose:** Collect and structure user profile information using CAMEL framework
+**Purpose:** Process career data and generate insights
 
-**CAMEL Implementation:**
-```python
-from camel.agents import ChatAgent
-from camel.messages import BaseMessage
-
-class ProfileCollectorAgent(ChatAgent):
-    def __init__(self):
-        system_message = BaseMessage.make_assistant_message(
-            role_name="Profile Collector",
-            content="You are a professional career counselor specializing in collecting and structuring user profile information for career positioning."
-        )
-        super().__init__(system_message)
-    
-    def collect_and_validate_profile(self, form_data: dict) -> dict:
-        # Use CAMEL agent to validate and structure profile data
-        validation_prompt = self._create_validation_prompt(form_data)
-        response = self.step(validation_prompt)
-        return self._parse_validation_response(response)
-```
-
-**Interface:**
+**Implementation:**
 ```typescript
-interface ProfileCollectorAgent {
-  collectBasicInfo(): Promise<BasicProfileForm>
-  validateProfileData(data: ProfileData): ValidationResult
-  structureProfileData(rawData: FormData): StructuredProfile
-  updateSharedContext(profile: StructuredProfile): Promise<void>
+// Career analysis service
+interface CareerAnalysisEngine {
+  analyzeProfile(profileData: ProfileData): Promise<ProfileAnalysis>
+  generateAssessment(profileContext: ProfileData): Promise<AssessmentQuestions>
+  scoreAssessment(responses: AssessmentResponse[]): Promise<AssessmentResults>
+  synthesizeCareerProfile(profile: ProfileData, assessment: AssessmentResults): Promise<CareerProfile>
+  generateJobRecommendations(careerProfile: CareerProfile): Promise<JobRecommendation[]>
+  refineRecommendations(recommendations: JobRecommendation[], feedback: UserFeedback): Promise<JobRecommendation[]>
 }
 ```
 
-### 3. Assessment Agent (CAMEL.AI)
+#### 3. Dynamic Component System
 
-**Purpose:** Generate and conduct personality/career assessments using CAMEL framework
+**Purpose:** Render interactive components within chat messages
 
-**CAMEL Implementation:**
-```python
-class AssessmentAgent(ChatAgent):
-    def __init__(self):
-        system_message = BaseMessage.make_assistant_message(
-            role_name="Assessment Specialist",
-            content="You are a psychological assessment expert who creates personalized career and personality assessments."
-        )
-        super().__init__(system_message)
-    
-    def generate_personalized_questions(self, profile_context: dict) -> list:
-        # Use CAMEL agent to generate contextual assessment questions
-        generation_prompt = self._create_question_generation_prompt(profile_context)
-        response = self.step(generation_prompt)
-        return self._parse_questions(response)
-    
-    def score_and_interpret(self, responses: list) -> dict:
-        # Use CAMEL agent for intelligent scoring and interpretation
-        scoring_prompt = self._create_scoring_prompt(responses)
-        response = self.step(scoring_prompt)
-        return self._parse_assessment_results(response)
-```
-
-**Interface:**
+**Implementation:**
 ```typescript
-interface AssessmentAgent {
-  generateQuestions(profileContext: ProfileContext): Promise<Question[]>
-  conductAssessment(questions: Question[]): Promise<AssessmentSession>
-  scoreAssessment(responses: Response[]): AssessmentResults
-  interpretResults(scores: AssessmentResults): PersonalityProfile
+// Component renderer for chat messages
+interface ComponentRenderer {
+  renderComponent(type: ComponentType, data: any, messageId: string): React.ReactElement
+  handleComponentSubmission(componentId: string, data: any): Promise<void>
+  updateComponentState(componentId: string, newState: any): void
 }
-```
 
-### 4. Analysis Agent (CAMEL.AI)
-
-**Purpose:** Synthesize profile and assessment data into career insights using CAMEL framework
-
-**CAMEL Implementation:**
-```python
-class AnalysisAgent(ChatAgent):
-    def __init__(self):
-        system_message = BaseMessage.make_assistant_message(
-            role_name="Career Analysis Expert",
-            content="You are a senior career analyst who synthesizes personality, skills, and experience data to provide comprehensive career insights."
-        )
-        super().__init__(system_message)
-    
-    def generate_comprehensive_analysis(self, profile_data: dict, assessment_results: dict) -> dict:
-        # Use CAMEL agent for deep career analysis
-        analysis_prompt = self._create_analysis_prompt(profile_data, assessment_results)
-        response = self.step(analysis_prompt)
-        return self._parse_career_analysis(response)
-    
-    def identify_career_patterns(self, combined_data: dict) -> dict:
-        # Use CAMEL agent to identify career tendencies and patterns
-        pattern_prompt = self._create_pattern_analysis_prompt(combined_data)
-        response = self.step(pattern_prompt)
-        return self._parse_career_patterns(response)
-```
-
-**Interface:**
-```typescript
-interface AnalysisAgent {
-  analyzePersonality(assessment: AssessmentResults): PersonalityAnalysis
-  generateCareerProfile(profile: StructuredProfile, personality: PersonalityAnalysis): CareerProfile
-  identifyStrengths(combinedData: CombinedUserData): StrengthAnalysis
-  createCareerTendencies(analysis: ComprehensiveAnalysis): CareerTendencies
-}
-```
-
-### 5. Recommendation Agent (CAMEL.AI)
-
-**Purpose:** Generate job recommendations and finalize career directions using CAMEL framework
-
-**CAMEL Implementation:**
-```python
-class RecommendationAgent(ChatAgent):
-    def __init__(self):
-        system_message = BaseMessage.make_assistant_message(
-            role_name="Career Recommendation Specialist",
-            content="You are a career recommendation expert who matches candidates with suitable job positions and career paths based on comprehensive analysis."
-        )
-        super().__init__(system_message)
-    
-    def generate_job_recommendations(self, career_analysis: dict) -> list:
-        # Use CAMEL agent to generate personalized job recommendations
-        recommendation_prompt = self._create_recommendation_prompt(career_analysis)
-        response = self.step(recommendation_prompt)
-        return self._parse_job_recommendations(response)
-    
-    def refine_based_on_feedback(self, initial_recommendations: list, user_feedback: dict) -> list:
-        # Use CAMEL agent to refine recommendations based on user preferences
-        refinement_prompt = self._create_refinement_prompt(initial_recommendations, user_feedback)
-        response = self.step(refinement_prompt)
-        return self._parse_refined_recommendations(response)
-    
-    def synthesize_final_directions(self, all_data: dict) -> list:
-        # Use CAMEL agent to create final career directions
-        synthesis_prompt = self._create_synthesis_prompt(all_data)
-        response = self.step(synthesis_prompt)
-        return self._parse_career_directions(response)
-```
-
-**Interface:**
-```typescript
-interface RecommendationAgent {
-  generateInitialRecommendations(careerProfile: CareerProfile): JobRecommendation[]
-  processUserFeedback(feedback: UserFeedback): RefinedRecommendations
-  synthesizeCareerDirections(preferences: UserPreferences): CareerDirection[]
-  finalizeRecommendations(directions: CareerDirection[]): FinalCareerPlan
-}
+// Component types that can be rendered in chat
+type ComponentType = 
+  | 'profile-form'
+  | 'assessment-quiz'
+  | 'analysis-display'
+  | 'job-recommendations'
+  | 'career-directions'
+  | 'loading-indicator'
+  | 'error-display'
 ```
 
 ## Data Models
@@ -401,8 +344,33 @@ interface RecommendationAgent {
 ### Core Data Structures
 
 ```typescript
-// User Profile Data
-interface StructuredProfile {
+// Chat message structure
+interface ChatMessage {
+  id: string
+  conversationId: string
+  userId: string
+  type: 'user' | 'assistant' | 'component'
+  content: string
+  componentType?: ComponentType
+  componentData?: any
+  timestamp: Date
+  metadata?: MessageMetadata
+}
+
+// Conversation context
+interface ConversationContext {
+  conversationId: string
+  userId: string
+  currentPhase?: 'general' | 'career-positioning'
+  careerSessionId?: string
+  messageHistory: ChatMessage[]
+  userProfile?: Partial<ProfileData>
+  assessmentProgress?: AssessmentProgress
+  analysisResults?: CareerAnalysis
+}
+
+// User profile data structure
+interface ProfileData {
   basicInfo: {
     age: number
     gender: string
@@ -413,222 +381,468 @@ interface StructuredProfile {
     level: EducationLevel
     school: string
     major: string
+    graduationYear?: number
   }
   experience: {
     workExperience: WorkExperience[]
     internshipExperience: InternshipExperience[]
+    totalYearsExperience: number
   }
   skills: {
     professionalSkills: string[]
     knowledgeAreas: string[]
+    certifications?: string[]
   }
-  optional: {
+  preferences: {
     mbti?: string
     interests?: string[]
+    careerGoals?: string[]
+    workEnvironmentPreferences?: string[]
   }
 }
 
-// Assessment Results
+// Assessment structure
+interface AssessmentQuestions {
+  id: string
+  questions: Question[]
+  estimatedTime: number
+  categories: AssessmentCategory[]
+}
+
+interface Question {
+  id: string
+  text: string
+  type: 'multiple-choice' | 'rating-scale' | 'ranking'
+  options?: string[]
+  category: string
+  required: boolean
+}
+
+// Assessment results
 interface AssessmentResults {
-  personalityScores: PersonalityScores
-  careerPreferenceScores: CareerPreferenceScores
-  responsePatterns: ResponsePattern[]
-  completionMetrics: AssessmentMetrics
+  sessionId: string
+  responses: QuestionResponse[]
+  scores: {
+    personality: PersonalityScores
+    careerPreferences: CareerPreferenceScores
+    workStyle: WorkStyleScores
+  }
+  completionTime: number
+  completionDate: Date
 }
 
-// Career Analysis
-interface CareerProfile {
-  personalityAnalysis: PersonalityAnalysis
-  strengthsWeaknesses: StrengthAnalysis
-  careerTendencies: CareerTendencies
-  fitAnalysis: CareerFitAnalysis
-  recommendationBasis: RecommendationReasoning
+// Career analysis results
+interface CareerAnalysis {
+  personalityProfile: {
+    traits: PersonalityTrait[]
+    strengths: string[]
+    developmentAreas: string[]
+    workingStyle: WorkingStyleProfile
+  }
+  careerFit: {
+    suitableRoles: string[]
+    industries: string[]
+    workEnvironments: string[]
+    careerPaths: CareerPath[]
+  }
+  recommendations: {
+    immediate: string[]
+    shortTerm: string[]
+    longTerm: string[]
+  }
 }
 
-// Job Recommendations
+// Job recommendations
 interface JobRecommendation {
-  positionTitle: string
+  id: string
+  title: string
+  company?: string
   industry: string
+  location: string
   fitScore: number
-  reasoning: string[]
+  matchReasons: string[]
   requirements: JobRequirement[]
-  careerPath: CareerPath
+  salaryRange?: SalaryRange
+  careerProgression: string[]
+  userFeedback?: 'interested' | 'not-interested' | 'maybe'
+}
+
+// Career directions
+interface CareerDirection {
+  id: string
+  title: string
+  description: string
+  suitabilityScore: number
+  requiredSkills: string[]
+  recommendedActions: ActionItem[]
+  timeframe: string
+  careerProgression: CareerStep[]
+  resources: Resource[]
 }
 ```
 
 ### Integration Layer
 
-#### 1. CAMEL Agent Service (Python)
-```python
-# services/camel_agent_service.py
-from camel.agents import ChatAgent
-from camel.societies import RolePlaying
-
-class CAMELAgentService:
-    def __init__(self):
-        self.orchestrator = CareerPositioningOrchestrator()
-    
-    async def process_profile_data(self, user_id: str, profile_data: dict) -> dict:
-        return await self.orchestrator.route_request({
-            'type': 'profile_processing',
-            'user_id': user_id,
-            'data': profile_data
-        })
-    
-    async def generate_assessment(self, user_id: str, profile_context: dict) -> dict:
-        return await self.orchestrator.route_request({
-            'type': 'assessment_generation',
-            'user_id': user_id,
-            'context': profile_context
-        })
-```
-
-#### 2. Next.js API Integration
+#### 1. Chat Service Integration
 ```typescript
-// app/api/career-positioning/agents/route.ts
-import { CAMELAgentService } from '@/services/camel_agent_service'
+// services/chat-service.ts
+interface ChatService {
+  sendMessage(conversationId: string, message: string): Promise<ChatMessage>
+  getConversationHistory(conversationId: string): Promise<ChatMessage[]>
+  createConversation(userId: string, title?: string): Promise<Conversation>
+  streamResponse(message: string, context: ConversationContext): AsyncGenerator<string>
+}
 
-const agentService = new CAMELAgentService()
-
-export async function POST(request: Request) {
-  const { action, userId, data } = await request.json()
+// AI service integration
+class AIService {
+  async processMessage(message: string, context: ConversationContext): Promise<AIResponse> {
+    // Integrate with OpenAI or similar service
+    const intent = await this.recognizeIntent(message, context)
+    
+    if (intent.type === 'career-positioning') {
+      return await this.handleCareerIntent(intent, context)
+    }
+    
+    return await this.generateConversationalResponse(message, context)
+  }
   
-  switch (action) {
-    case 'process_profile':
-      return await agentService.process_profile_data(userId, data)
-    case 'generate_assessment':
-      return await agentService.generate_assessment(userId, data)
-    case 'analyze_career':
-      return await agentService.analyze_career_data(userId, data)
-    case 'generate_recommendations':
-      return await agentService.generate_recommendations(userId, data)
+  private async handleCareerIntent(intent: CareerIntent, context: ConversationContext): Promise<AIResponse> {
+    // Determine which component to render based on career positioning phase
+    const phase = this.determineCareerPhase(context)
+    
+    switch (phase) {
+      case 'profile-collection':
+        return {
+          message: "I'd like to learn more about your background. Please fill out this profile form:",
+          shouldRenderComponent: true,
+          componentType: 'profile-form',
+          componentData: await this.generateProfileForm(context)
+        }
+      case 'assessment':
+        return {
+          message: "Now let's do a quick assessment to understand your personality and preferences:",
+          shouldRenderComponent: true,
+          componentType: 'assessment-quiz',
+          componentData: await this.generateAssessment(context)
+        }
+      // ... other phases
+    }
   }
 }
 ```
 
-#### 3. Real-time Updates (Supabase Realtime)
+#### 2. Real-time Updates (Supabase Realtime)
 ```typescript
-// hooks/useCareerPositioningRealtime.ts
+// hooks/useChatRealtime.ts
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 
-export function useCareerPositioningRealtime(sessionId: string) {
-  const [agentStatus, setAgentStatus] = useState<AgentStatus>('idle')
+export function useChatRealtime(conversationId: string) {
+  const [messages, setMessages] = useState<ChatMessage[]>([])
+  const [isTyping, setIsTyping] = useState(false)
   
   useEffect(() => {
     const channel = supabase
-      .channel(`career-positioning-${sessionId}`)
+      .channel(`chat-${conversationId}`)
       .on('postgres_changes', {
-        event: 'UPDATE',
+        event: 'INSERT',
         schema: 'public',
-        table: 'career_positioning_sessions',
-        filter: `id=eq.${sessionId}`
+        table: 'chat_messages',
+        filter: `conversation_id=eq.${conversationId}`
       }, (payload) => {
-        setAgentStatus(payload.new.agent_status)
+        setMessages(prev => [...prev, payload.new as ChatMessage])
+      })
+      .on('presence', { event: 'sync' }, () => {
+        // Handle typing indicators
       })
       .subscribe()
     
     return () => supabase.removeChannel(channel)
-  }, [sessionId])
+  }, [conversationId])
   
-  return { agentStatus }
+  return { messages, isTyping }
+}
+
+// hooks/useCareerSession.ts
+export function useCareerSession(sessionId?: string) {
+  const [session, setSession] = useState<CareerSession | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  
+  const updateSession = async (data: Partial<CareerSession>) => {
+    if (!sessionId) return
+    
+    setIsLoading(true)
+    try {
+      const { data: updatedSession } = await supabase
+        .from('career_sessions')
+        .update(data)
+        .eq('id', sessionId)
+        .select()
+        .single()
+      
+      setSession(updatedSession)
+    } catch (error) {
+      console.error('Error updating career session:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+  
+  return { session, updateSession, isLoading }
+}
+```
+
+#### 3. Component Integration System
+```typescript
+// components/chat/ComponentRenderer.tsx
+interface ComponentRendererProps {
+  message: ChatMessage
+  onComponentSubmit: (componentId: string, data: any) => void
+}
+
+export function ComponentRenderer({ message, onComponentSubmit }: ComponentRendererProps) {
+  const renderComponent = () => {
+    switch (message.componentType) {
+      case 'profile-form':
+        return (
+          <ProfileFormComponent
+            data={message.componentData}
+            onSubmit={(data) => onComponentSubmit(message.id, data)}
+          />
+        )
+      case 'assessment-quiz':
+        return (
+          <AssessmentComponent
+            questions={message.componentData.questions}
+            onComplete={(results) => onComponentSubmit(message.id, results)}
+          />
+        )
+      case 'analysis-display':
+        return (
+          <AnalysisComponent
+            analysis={message.componentData}
+            onInteraction={(interaction) => onComponentSubmit(message.id, interaction)}
+          />
+        )
+      case 'job-recommendations':
+        return (
+          <RecommendationsComponent
+            recommendations={message.componentData}
+            onFeedback={(feedback) => onComponentSubmit(message.id, feedback)}
+          />
+        )
+      case 'career-directions':
+        return (
+          <CareerDirectionsComponent
+            directions={message.componentData}
+            onSelection={(selection) => onComponentSubmit(message.id, selection)}
+          />
+        )
+      default:
+        return null
+    }
+  }
+  
+  return (
+    <Box>
+      <Text mb={4}>{message.content}</Text>
+      {message.componentType && renderComponent()}
+    </Box>
+  )
 }
 ```
 
 ## Error Handling
 
-### Agent-Level Error Handling
+### Chat System Error Handling
 
-1. **Individual Agent Failures:**
-   - Implement circuit breaker pattern for each agent
-   - Graceful degradation when agents are unavailable
-   - Automatic retry with exponential backoff
+1. **Message Delivery Failures:**
+   - Implement message queuing with retry logic
+   - Graceful degradation when real-time features are unavailable
+   - Offline message storage and sync when connection is restored
 
-2. **Communication Failures:**
-   - Message queue with persistence for inter-agent communication
-   - Timeout handling for agent responses
-   - Fallback mechanisms for critical operations
+2. **AI Service Failures:**
+   - Fallback responses when AI service is unavailable
+   - Timeout handling for AI response generation
+   - Circuit breaker pattern for AI service calls
 
-3. **Data Consistency:**
-   - Transaction-like operations for shared memory updates
-   - Conflict resolution for concurrent agent operations
-   - Data validation at each agent boundary
+3. **Component Rendering Failures:**
+   - Error boundaries for interactive components
+   - Fallback UI when components fail to load
+   - Data validation before component rendering
 
-### System-Level Error Recovery
+### Career Analysis Error Handling
 
 ```typescript
-interface ErrorRecoveryStrategy {
-  handleAgentFailure(agentType: AgentType, error: AgentError): RecoveryAction
-  restoreSessionState(sessionId: string): Promise<SessionState>
-  validateSystemConsistency(): Promise<ConsistencyReport>
-  executeRecoveryPlan(plan: RecoveryPlan): Promise<RecoveryResult>
+interface ErrorHandlingStrategy {
+  handleAIServiceFailure(error: AIServiceError): Promise<FallbackResponse>
+  handleComponentFailure(componentType: ComponentType, error: Error): React.ReactElement
+  handleDataValidationFailure(data: any, schema: ValidationSchema): ValidationResult
+  recoverCareerSession(sessionId: string): Promise<CareerSession>
+}
+
+// Error boundary for chat components
+class ChatErrorBoundary extends React.Component {
+  constructor(props: any) {
+    super(props)
+    this.state = { hasError: false, error: null }
+  }
+  
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error }
+  }
+  
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('Chat component error:', error, errorInfo)
+    // Log to error reporting service
+  }
+  
+  render() {
+    if (this.state.hasError) {
+      return (
+        <Box p={4} bg="red.50" borderRadius="md" borderWidth="1px" borderColor="red.200">
+          <Text color="red.600">Something went wrong with this component.</Text>
+          <Button size="sm" mt={2} onClick={() => this.setState({ hasError: false, error: null })}>
+            Try Again
+          </Button>
+        </Box>
+      )
+    }
+    
+    return this.props.children
+  }
 }
 ```
 
 ## Testing Strategy
 
 ### Unit Testing
-- Individual agent logic testing
+- Chat interface component testing
+- Interactive component testing (forms, assessments, displays)
+- AI service integration testing
 - Data model validation testing
-- Communication protocol testing
-- Error handling scenario testing
 
 ### Integration Testing
-- Multi-agent workflow testing
-- Shared memory consistency testing
-- End-to-end user journey testing
-- Performance and scalability testing
+- End-to-end chat conversation flow testing
+- Career positioning workflow testing
+- Real-time message delivery testing
+- Database operations and data consistency testing
 
-### Agent-Specific Testing
+### Component-Specific Testing
 
-1. **Profile Collector Agent:**
-   - Form validation testing
-   - Data structuring accuracy
-   - Edge case handling (incomplete data)
+1. **Chat Interface Components:**
+   - Message rendering and display
+   - Input handling and validation
+   - Real-time updates and synchronization
+   - Mobile responsiveness and accessibility
 
-2. **Assessment Agent:**
-   - Question generation quality
-   - Scoring algorithm accuracy
-   - Adaptive questioning logic
+2. **Interactive Career Components:**
+   - Form validation and submission
+   - Assessment question flow and progress tracking
+   - Analysis display and interaction handling
+   - Recommendation feedback and refinement
 
-3. **Analysis Agent:**
-   - Profile synthesis accuracy
-   - Reasoning quality assessment
-   - Consistency across different user types
+3. **AI Integration:**
+   - Intent recognition accuracy
+   - Response generation quality
+   - Context management and memory
+   - Error handling and fallback responses
 
-4. **Recommendation Agent:**
-   - Recommendation relevance scoring
-   - Preference learning effectiveness
-   - Career direction synthesis quality
-
-### Multi-Agent System Testing
+### System Testing
 
 ```typescript
-interface SystemTestSuite {
-  testAgentCommunication(): Promise<TestResult>
-  testWorkflowCoordination(): Promise<TestResult>
+interface ChatSystemTestSuite {
+  testConversationFlow(): Promise<TestResult>
+  testComponentRendering(): Promise<TestResult>
+  testRealTimeUpdates(): Promise<TestResult>
+  testCareerWorkflow(): Promise<TestResult>
   testErrorRecovery(): Promise<TestResult>
-  testDataConsistency(): Promise<TestResult>
   testPerformanceUnderLoad(): Promise<TestResult>
+  testAccessibilityCompliance(): Promise<TestResult>
 }
+
+// Example test cases
+describe('Career Positioning Chat Flow', () => {
+  test('should recognize career intent and render profile form', async () => {
+    const chatService = new ChatService()
+    const response = await chatService.sendMessage(conversationId, "I need help with career positioning")
+    
+    expect(response.shouldRenderComponent).toBe(true)
+    expect(response.componentType).toBe('profile-form')
+  })
+  
+  test('should progress through complete career analysis workflow', async () => {
+    // Test complete flow from profile collection to final recommendations
+  })
+  
+  test('should handle component failures gracefully', async () => {
+    // Test error boundaries and fallback UI
+  })
+})
 ```
 
 ## Performance Considerations
 
-### Scalability Design
-- Horizontal scaling of individual agents
-- Load balancing for agent requests
-- Caching strategies for frequently accessed data
+### Chat System Scalability
+- Message virtualization for large conversation histories
+- Efficient real-time connection management
+- Horizontal scaling of chat API endpoints
+- Database query optimization for message retrieval
+
+### AI Service Optimization
+- Response caching for similar queries
+- Streaming responses for better perceived performance
+- Request batching for career analysis operations
 - Asynchronous processing for non-blocking operations
 
-### Optimization Strategies
-- Agent response caching
-- Predictive pre-loading of assessment questions
-- Batch processing for analysis operations
-- Memory-efficient data structures for shared state
+### Frontend Performance
+- Code splitting for interactive components
+- Lazy loading of career analysis features
+- Optimistic UI updates for better responsiveness
+- Memory management for long chat sessions
 
 ### Monitoring and Metrics
-- Agent performance metrics
-- Communication latency tracking
-- User experience metrics
-- System resource utilization monitoring
+
+```typescript
+interface PerformanceMetrics {
+  chatMetrics: {
+    messageDeliveryTime: number
+    realTimeLatency: number
+    componentRenderTime: number
+    conversationLoadTime: number
+  }
+  aiMetrics: {
+    responseGenerationTime: number
+    intentRecognitionAccuracy: number
+    contextProcessingTime: number
+    streamingLatency: number
+  }
+  careerAnalysisMetrics: {
+    profileProcessingTime: number
+    assessmentGenerationTime: number
+    analysisGenerationTime: number
+    recommendationGenerationTime: number
+  }
+  userExperienceMetrics: {
+    sessionDuration: number
+    completionRate: number
+    userSatisfactionScore: number
+    errorRate: number
+  }
+}
+
+// Performance monitoring service
+class PerformanceMonitor {
+  trackChatPerformance(metric: string, value: number, metadata?: any) {
+    // Send metrics to monitoring service
+  }
+  
+  trackUserJourney(userId: string, event: string, timestamp: Date) {
+    // Track user interaction patterns
+  }
+  
+  generatePerformanceReport(): Promise<PerformanceReport> {
+    // Generate comprehensive performance analysis
+  }
+}
+```
