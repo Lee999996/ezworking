@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Career Positioning feature implements a Multi-Agent system architecture using CAMEL.AI framework where specialized AI agents collaborate to provide comprehensive career guidance. The system consists of a React + Next.js frontend with Supabase backend, integrated with four primary CAMEL agents that work together through structured communication protocols to deliver personalized career positioning recommendations.
+The Career Positioning feature implements an intelligent Multi-Agent system architecture using CAMEL.AI framework that combines structured workflows with flexible conversational AI. The system features an Intent Recognition Agent that routes users to appropriate specialized agents or workflows, while supporting real-time streaming responses. It consists of a React + Next.js frontend with Supabase backend, integrated with multiple CAMEL agents that work together to provide both structured career positioning workflows and general conversational assistance.
 
 ## Architecture
 
@@ -23,22 +23,39 @@ graph TB
     end
     
     subgraph "CAMEL.AI Agent Layer"
-        Orchestrator[CAMEL Agent Orchestrator]
+        ManagerAgent[Manager Agent]
+        ConversationAgent[General Conversation Agent]
+        MemoryAgent[User Memory Agent]
         ProfileAgent[Profile Collector Agent]
         AssessmentAgent[Assessment Agent]
         AnalysisAgent[Analysis Agent]
         RecommendationAgent[Recommendation Agent]
+        StreamManager[Streaming Response Manager]
     end
     
     UI --> API
     API --> Auth
     API --> DB
-    API --> Orchestrator
+    API --> ManagerAgent
+    ManagerAgent --> ConversationAgent
+    ManagerAgent --> ProfileAgent
+    ManagerAgent --> AssessmentAgent
+    ManagerAgent --> AnalysisAgent
+    ManagerAgent --> RecommendationAgent
     
-    Orchestrator --> ProfileAgent
-    Orchestrator --> AssessmentAgent
-    Orchestrator --> AnalysisAgent
-    Orchestrator --> RecommendationAgent
+    ConversationAgent --> StreamManager
+    ProfileAgent --> StreamManager
+    AssessmentAgent --> StreamManager
+    AnalysisAgent --> StreamManager
+    RecommendationAgent --> StreamManager
+    StreamManager --> API
+    
+    ConversationAgent --> MemoryAgent
+    ProfileAgent --> MemoryAgent
+    AssessmentAgent --> MemoryAgent
+    AnalysisAgent --> MemoryAgent
+    RecommendationAgent --> MemoryAgent
+    MemoryAgent --> DB
     
     ProfileAgent --> DB
     AssessmentAgent --> DB
@@ -53,62 +70,128 @@ graph TB
 - **Database**: Supabase (PostgreSQL)
 - **Authentication**: Supabase Auth
 - **AI Agents**: CAMEL.AI Framework
-- **Real-time**: Supabase Realtime (for agent status updates)
+- **Real-time**: Supabase Realtime (for agent status updates) + Server-Sent Events (SSE)
+- **UI Framework**: Hybrid GUI/LUI approach combining conversational and visual interfaces
 - **Styling**: Tailwind CSS (based on existing codebase pattern)
+- **Streaming**: Real-time token streaming with structured data rendering
 
 ### System Communication Flow
 
+#### Manager Agent Coordination Flow
 ```mermaid
 sequenceDiagram
     participant U as User (React UI)
-    participant API as Next.js API
+    participant API as Next.js API (SSE)
+    participant MA as Manager Agent
+    participant CA as Conversation Agent
+    participant PA as Profile Agent
+    participant SM as Stream Manager
     participant DB as Supabase DB
-    participant O as CAMEL Orchestrator
+
+    U->>API: Send Message
+    API->>MA: Analyze User Request
+    MA->>MA: Determine Required Agents & Strategy
+    
+    alt General Conversation
+        MA->>CA: Delegate to Conversation Agent
+        CA->>MA: Response Ready
+        MA->>SM: Coordinate Stream Response
+        SM->>API: Real-time Streaming
+        API->>U: Stream Response to UI
+    else Career Positioning Workflow
+        MA->>PA: Initialize Profile Collection
+        MA->>DB: Create/Update Session
+        PA->>MA: Profile Collection Ready
+        MA->>SM: Stream Workflow Start
+        SM->>API: Stream Status Update
+        API->>U: Stream Workflow Progress
+    else Multi-Agent Collaboration
+        MA->>PA: Request Profile Data
+        MA->>CA: Request Conversational Context
+        MA->>MA: Synthesize Agent Responses
+        MA->>SM: Stream Coordinated Response
+        SM->>API: Stream Unified Response
+        API->>U: Stream Collaborative Result
+    end
+```
+
+#### Manager Agent Orchestrated Workflow Flow
+```mermaid
+sequenceDiagram
+    participant U as User (React UI)
+    participant API as Next.js API (SSE)
+    participant MA as Manager Agent
     participant PC as Profile Collector Agent
     participant AS as Assessment Agent
     participant AN as Analysis Agent
     participant RC as Recommendation Agent
+    participant SM as Stream Manager
+    participant DB as Supabase DB
 
-    U->>API: Start Career Positioning
-    API->>DB: Create Session Record
-    API->>O: Initialize CAMEL Agents
-    O->>PC: Initialize Profile Collection
+    U->>API: Start Career Positioning Workflow
+    API->>MA: Initialize Career Positioning
+    MA->>DB: Create Session Record
+    MA->>PC: Delegate Profile Collection
+    PC->>MA: Profile Collection Ready
+    MA->>SM: Stream Welcome Message
+    SM->>API: Stream to User
+    API->>U: Stream Profile Collection Start
     
-    U->>API: Submit Profile Form
-    API->>DB: Store Profile Data
-    API->>PC: Process Profile Data
+    U->>API: Submit Profile Data
+    API->>MA: Process Profile Request
+    MA->>PC: Validate Profile Data
     PC->>PC: Validate & Structure Data
-    PC->>O: Profile Processing Complete
+    PC->>MA: Validation Complete
+    MA->>SM: Stream Validation Results
+    SM->>API: Stream Progress Update
+    API->>U: Stream Validation Feedback
+    MA->>DB: Store Profile Data
     
-    O->>AS: Generate Assessment Questions
-    AS->>AS: Create Personalized Questions
-    AS->>API: Return Questions
-    API->>U: Present Assessment Questions
+    MA->>AS: Request Assessment Generation
+    AS->>MA: Assessment Questions Ready
+    MA->>SM: Stream Question Generation
+    SM->>API: Stream Questions
+    API->>U: Stream Assessment Questions
     
     U->>API: Submit Assessment Answers
-    API->>DB: Store Assessment Results
-    API->>AS: Process Assessment Results
+    API->>MA: Process Assessment Request
+    MA->>AS: Score Assessment Results
     AS->>AS: Score & Interpret Results
-    AS->>O: Assessment Analysis Complete
+    AS->>MA: Assessment Analysis Complete
+    MA->>SM: Stream Analysis Progress
+    SM->>API: Stream Assessment Analysis
+    API->>U: Stream Assessment Results
+    MA->>DB: Store Assessment Results
     
-    O->>AN: Perform Career Analysis
-    AN->>DB: Retrieve All User Data
+    MA->>AN: Request Career Analysis
+    AN->>MA: Request User Data
+    MA->>DB: Retrieve All User Data
+    MA->>AN: Provide Complete User Context
     AN->>AN: Generate Career Profile
-    AN->>DB: Store Analysis Results
-    AN->>O: Analysis Complete
+    AN->>MA: Career Analysis Complete
+    MA->>SM: Stream Analysis Insights
+    SM->>API: Stream Career Analysis
+    API->>U: Stream Career Profile
+    MA->>DB: Store Analysis Results
     
-    O->>RC: Generate Job Recommendations
-    RC->>DB: Retrieve Career Analysis
+    MA->>RC: Request Job Recommendations
+    RC->>MA: Request Career Analysis
+    MA->>RC: Provide Career Analysis Context
     RC->>RC: Generate Recommendations
-    RC->>API: Return Recommendations
-    API->>U: Present Job Recommendations
+    RC->>MA: Recommendations Ready
+    MA->>SM: Stream Recommendations
+    SM->>API: Stream Job Matches
+    API->>U: Stream Job Recommendations
     
     U->>API: Provide Feedback on Jobs
-    API->>RC: Process User Preferences
+    API->>MA: Process User Feedback
+    MA->>RC: Refine Recommendations
     RC->>RC: Refine Recommendations
-    RC->>DB: Store Final Career Directions
-    RC->>API: Return Final Directions
-    API->>U: Present Career Directions
+    RC->>MA: Refined Results Ready
+    MA->>SM: Stream Refined Results
+    SM->>API: Stream Final Directions
+    API->>U: Stream Career Directions
+    MA->>DB: Store Final Career Directions
 ```
 
 ## Components and Interfaces
@@ -123,34 +206,44 @@ interface CareerPositioningPage {
   workspaceId: string
 }
 
-// Components structure
+// Components structure - Hybrid GUI/LUI Interface
 interface CareerPositioningComponents {
-  ProfileForm: React.FC<ProfileFormProps>
-  AssessmentQuiz: React.FC<AssessmentQuizProps>
-  ProfileAnalysis: React.FC<ProfileAnalysisProps>
-  JobRecommendations: React.FC<JobRecommendationsProps>
-  CareerDirections: React.FC<CareerDirectionsProps>
+  ChatInterface: React.FC<ChatInterfaceProps>
+  StreamingMessage: React.FC<StreamingMessageProps>
+  AssessmentCard: React.FC<AssessmentCardProps>
+  JobRecommendationCard: React.FC<JobRecommendationCardProps>
+  AnalysisVisualization: React.FC<AnalysisVisualizationProps>
+  InteractiveWorkflowCards: React.FC<WorkflowCardProps>
+  ConversationalFeedback: React.FC<FeedbackProps>
 }
 ```
 
-#### 2. API Routes (Next.js)
+#### 2. API Routes (Next.js) - Hybrid Response Format
 ```typescript
-// app/api/career-positioning/route.ts
-interface CareerPositioningAPI {
-  POST: (request: Request) => Promise<Response> // Initialize session
-  GET: (request: Request) => Promise<Response>  // Get session status
+// app/api/career-positioning/chat/route.ts
+interface ChatAPI {
+  POST: (request: Request) => Promise<Response> // Send message with streaming response
 }
 
-// app/api/career-positioning/profile/route.ts
-interface ProfileAPI {
-  POST: (request: Request) => Promise<Response> // Submit profile data
-  PUT: (request: Request) => Promise<Response>  // Update profile
+// app/api/career-positioning/stream/route.ts
+interface StreamingAPI {
+  GET: (request: Request) => Promise<Response>  // SSE endpoint for real-time streaming
 }
 
-// app/api/career-positioning/assessment/route.ts
-interface AssessmentAPI {
-  GET: (request: Request) => Promise<Response>  // Get questions
-  POST: (request: Request) => Promise<Response> // Submit answers
+// Response format for hybrid UI
+interface HybridResponse {
+  type: 'conversation' | 'card' | 'mixed'
+  content: {
+    text?: string // For streaming conversational content
+    cards?: CardData[] // For structured visual components
+    metadata?: ResponseMetadata
+  }
+}
+
+interface CardData {
+  type: 'assessment' | 'job_recommendation' | 'analysis_chart'
+  data: any
+  actions?: CardAction[]
 }
 ```
 
@@ -207,47 +300,301 @@ CREATE TABLE job_recommendations (
 
 ### CAMEL.AI Agent Integration
 
-#### 1. Agent Orchestrator (CAMEL.AI)
+#### 1. Manager Agent (CAMEL.AI)
 
-**Purpose:** Coordinates CAMEL agent workflow and manages system state
+**Purpose:** Coordinates and manages all specialized agents using CAMEL-AI's multi-agent framework
 
-**Implementation:**
+**CAMEL Implementation:**
 ```python
 from camel.agents import ChatAgent
-from camel.societies import RolePlaying
 from camel.messages import BaseMessage
+from camel.societies import RolePlaying
+from camel.types import TaskType
 
-class CareerPositioningOrchestrator:
+class CareerPositioningManagerAgent(ChatAgent):
     def __init__(self):
-        self.agents = {
-            'profile_collector': self._create_profile_agent(),
-            'assessment': self._create_assessment_agent(),
-            'analysis': self._create_analysis_agent(),
-            'recommendation': self._create_recommendation_agent()
+        system_message = BaseMessage.make_assistant_message(
+            role_name="Career Positioning Manager",
+            content="You are a manager agent responsible for coordinating specialized career counseling agents to provide comprehensive career positioning assistance."
+        )
+        super().__init__(system_message)
+        self.specialized_agents = self._initialize_specialized_agents()
+        self.active_sessions = {}
+    
+    def _initialize_specialized_agents(self):
+        return {
+            'conversation': GeneralConversationAgent(),
+            'profile_collector': ProfileCollectorAgent(),
+            'assessment': AssessmentAgent(),
+            'analysis': AnalysisAgent(),
+            'recommendation': RecommendationAgent(),
+            'memory': UserMemoryAgent()
         }
     
-    def initialize_session(self, user_id: str) -> dict:
-        # Initialize CAMEL agents for user session
-        pass
+    def coordinate_request(self, user_message: str, user_id: str, context: dict) -> dict:
+        # Analyze request and coordinate appropriate agents
+        coordination_prompt = self._create_coordination_prompt(user_message, context)
+        coordination_plan = self.step(coordination_prompt)
+        
+        # Execute coordination plan with specialized agents
+        return self._execute_coordination_plan(coordination_plan, user_id, context)
     
-    def route_request(self, request: dict) -> dict:
-        # Route to appropriate CAMEL agent
-        pass
+    def orchestrate_workflow(self, workflow_type: str, user_id: str) -> dict:
+        # Orchestrate multi-agent workflow using CAMEL societies
+        if workflow_type == "career_positioning":
+            return self._orchestrate_career_positioning_workflow(user_id)
+    
+    def _orchestrate_career_positioning_workflow(self, user_id: str):
+        # Create role-playing society for career positioning
+        task_prompt = "Complete comprehensive career positioning for user"
+        
+        # Coordinate agents in sequence with handoffs
+        profile_result = self._coordinate_agent('profile_collector', user_id)
+        assessment_result = self._coordinate_agent('assessment', user_id, profile_result)
+        analysis_result = self._coordinate_agent('analysis', user_id, {
+            'profile': profile_result,
+            'assessment': assessment_result
+        })
+        recommendation_result = self._coordinate_agent('recommendation', user_id, analysis_result)
+        
+        return self._synthesize_final_result({
+            'profile': profile_result,
+            'assessment': assessment_result,
+            'analysis': analysis_result,
+            'recommendations': recommendation_result
+        })
 ```
 
 **Interface:**
 ```typescript
-interface AgentOrchestrator {
-  initializeSession(userId: string): Promise<SessionContext>
-  routeRequest(request: UserRequest): Promise<AgentResponse>
-  handleAgentTransition(fromAgent: AgentType, toAgent: AgentType): Promise<void>
-  getSessionStatus(sessionId: string): SessionStatus
+interface ManagerAgent {
+  coordinateRequest(message: string, userId: string, context: ConversationContext): Promise<CoordinationResult>
+  orchestrateWorkflow(workflowType: string, userId: string): Promise<WorkflowResult>
+  delegateToAgent(agentType: AgentType, task: AgentTask): Promise<AgentResponse>
+  synthesizeAgentResponses(responses: AgentResponse[]): Promise<UnifiedResponse>
+  manageAgentHandoffs(fromAgent: AgentType, toAgent: AgentType, context: HandoffContext): Promise<void>
+}
+```
+
+#### 2. General Conversation Agent (CAMEL.AI)
+
+**Purpose:** Provides conversational assistance for general career-related queries
+
+**CAMEL Implementation:**
+```python
+class GeneralConversationAgent(ChatAgent):
+    def __init__(self):
+        system_message = BaseMessage.make_assistant_message(
+            role_name="Career Counselor",
+            content="You are a friendly career counselor who provides helpful advice and guidance on career-related topics."
+        )
+        super().__init__(system_message)
+    
+    def generate_response_stream(self, user_message: str, context: dict):
+        # Generate streaming conversational response
+        response_prompt = self._create_conversation_prompt(user_message, context)
+        for chunk in self.step_stream(response_prompt):
+            yield chunk
+```
+
+**Interface:**
+```typescript
+interface GeneralConversationAgent {
+  generateResponse(message: string, context: ConversationContext): AsyncGenerator<string>
+  maintainContext(context: ConversationContext): void
+  suggestWorkflows(userNeeds: string[]): WorkflowSuggestion[]
+}
+```
+
+#### 3. User Memory Agent (CAMEL.AI)
+
+**Purpose:** Maintains comprehensive user career memory and provides personalized context to other agents
+
+**CAMEL Implementation:**
+```python
+from camel.memories import ChatMemory, VectorMemory
+from camel.agents import ChatAgent
+
+class UserMemoryAgent(ChatAgent):
+    def __init__(self):
+        system_message = BaseMessage.make_assistant_message(
+            role_name="User Memory Manager",
+            content="You are responsible for maintaining comprehensive user career profiles and providing personalized context to other agents."
+        )
+        super().__init__(system_message)
+        self.chat_memory = ChatMemory()
+        self.vector_memory = VectorMemory()
+    
+    def update_user_profile(self, user_id: str, profile_data: dict):
+        # Update user's career profile in memory
+        memory_record = self._create_memory_record(user_id, profile_data)
+        self.chat_memory.write_records([memory_record])
+        self.vector_memory.add(user_id, profile_data)
+    
+    def get_user_context(self, user_id: str) -> dict:
+        # Retrieve comprehensive user context for other agents
+        records = self.chat_memory.get_records(user_id)
+        return self._synthesize_user_context(records)
+    
+    def update_job_preferences(self, user_id: str, preferences: dict):
+        # Update user's job preferences and saved positions
+        self._update_preference_memory(user_id, preferences)
+    
+    def track_progress(self, user_id: str, progress_data: dict):
+        # Track user's interview progress, learning progress, etc.
+        self._update_progress_memory(user_id, progress_data)
+```
+
+**Interface:**
+```typescript
+interface UserMemoryAgent {
+  updateUserProfile(userId: string, profileData: UserProfileData): Promise<void>
+  getUserContext(userId: string): Promise<UserContext>
+  updateJobPreferences(userId: string, preferences: JobPreferences): Promise<void>
+  trackProgress(userId: string, progressData: ProgressData): Promise<void>
+  getSavedJobs(userId: string): Promise<SavedJob[]>
+  getCareerInsights(userId: string): Promise<CareerInsights>
+}
+```
+
+#### 4. Streaming Response Manager (CAMEL.AI)
+
+**Purpose:** Manages real-time streaming of responses from all agents
+
+**Implementation:**
+```python
+class StreamingResponseManager:
+    def __init__(self):
+        self.active_streams = {}
+    
+    def create_stream(self, session_id: str, agent_type: str):
+        # Create new streaming session
+        stream = StreamingSession(session_id, agent_type)
+        self.active_streams[session_id] = stream
+        return stream
+    
+    def stream_response(self, session_id: str, content: str, metadata: dict):
+        # Stream content to frontend
+        if session_id in self.active_streams:
+            self.active_streams[session_id].send(content, metadata)
+```
+
+**Interface:**
+```typescript
+interface StreamingResponseManager {
+  createStream(sessionId: string, agentType: string): StreamingSession
+  streamResponse(sessionId: string, content: string, metadata: ResponseMetadata): void
+  closeStream(sessionId: string): void
+  getStreamStatus(sessionId: string): StreamStatus
+}
+```
+
+#### 4. Multi-Agent Society Integration (CAMEL.AI)
+
+**Purpose:** Implements CAMEL-AI's RolePlaying society for coordinated multi-agent interactions
+
+**Implementation:**
+```python
+from camel.societies import RolePlaying
+from camel.agents import ChatAgent
+from camel.messages import BaseMessage
+from camel.types import TaskType, RoleType
+
+class CareerPositioningSociety:
+    def __init__(self, manager_agent: CareerPositioningManagerAgent):
+        self.manager_agent = manager_agent
+        self.role_playing_sessions = {}
+    
+    def create_assessment_society(self, user_id: str, profile_context: dict):
+        # Create role-playing society for assessment generation
+        assistant_role_name = "Career Assessment Specialist"
+        user_role_name = "Profile Analysis Assistant"
+        
+        task_prompt = f"""
+        Generate personalized career assessment questions based on user profile:
+        {profile_context}
+        """
+        
+        assistant_inception_prompt = """
+        You are a career assessment specialist who creates personalized questions
+        to understand career preferences and personality traits.
+        """
+        
+        user_inception_prompt = """
+        You are assisting in creating the most relevant assessment questions
+        based on the user's background and career goals.
+        """
+        
+        role_play_session = RolePlaying(
+            assistant_role_name=assistant_role_name,
+            user_role_name=user_role_name,
+            assistant_agent_kwargs=dict(
+                system_message=BaseMessage.make_assistant_message(
+                    role_name=assistant_role_name,
+                    content=assistant_inception_prompt
+                )
+            ),
+            user_agent_kwargs=dict(
+                system_message=BaseMessage.make_assistant_message(
+                    role_name=user_role_name,
+                    content=user_inception_prompt
+                )
+            ),
+            task_prompt=task_prompt,
+            with_task_specify=True,
+        )
+        
+        self.role_playing_sessions[f"{user_id}_assessment"] = role_play_session
+        return role_play_session
+    
+    def create_analysis_society(self, user_id: str, combined_data: dict):
+        # Create role-playing society for career analysis
+        assistant_role_name = "Senior Career Analyst"
+        user_role_name = "Data Synthesis Specialist"
+        
+        task_prompt = f"""
+        Analyze comprehensive career data and generate insights:
+        Profile: {combined_data.get('profile', {})}
+        Assessment: {combined_data.get('assessment', {})}
+        """
+        
+        # Similar implementation for analysis role-playing
+        pass
+    
+    def execute_collaborative_analysis(self, session_key: str, max_iterations: int = 3):
+        # Execute role-playing session for collaborative analysis
+        if session_key in self.role_playing_sessions:
+            session = self.role_playing_sessions[session_key]
+            
+            chat_turn_limit = max_iterations
+            n = 0
+            input_msg = session.init_chat()
+            
+            while n < chat_turn_limit:
+                n += 1
+                assistant_response, user_response = session.step(input_msg)
+                
+                if session.terminated:
+                    break
+                    
+                input_msg = assistant_response
+            
+            return session.get_chat_history()
+```
+
+**Interface:**
+```typescript
+interface MultiAgentSociety {
+  createAssessmentSociety(userId: string, profileContext: ProfileContext): Promise<RolePlayingSession>
+  createAnalysisSociety(userId: string, combinedData: CombinedData): Promise<RolePlayingSession>
+  executeCollaborativeAnalysis(sessionKey: string, maxIterations: number): Promise<ChatHistory>
+  getActiveSessions(userId: string): Promise<ActiveSession[]>
 }
 ```
 
 ### 2. Profile Collector Agent (CAMEL.AI)
 
-**Purpose:** Collect and structure user profile information using CAMEL framework
+**Purpose:** Collect and structure user profile information under Manager Agent coordination
 
 **CAMEL Implementation:**
 ```python
@@ -255,64 +602,111 @@ from camel.agents import ChatAgent
 from camel.messages import BaseMessage
 
 class ProfileCollectorAgent(ChatAgent):
-    def __init__(self):
+    def __init__(self, manager_agent=None):
         system_message = BaseMessage.make_assistant_message(
-            role_name="Profile Collector",
-            content="You are a professional career counselor specializing in collecting and structuring user profile information for career positioning."
+            role_name="Profile Collector Specialist",
+            content="You are a specialized agent working under a Manager Agent to collect and structure user profile information for career positioning. You coordinate with the Manager Agent for all decisions and data sharing."
         )
         super().__init__(system_message)
+        self.manager_agent = manager_agent
     
-    def collect_and_validate_profile(self, form_data: dict) -> dict:
-        # Use CAMEL agent to validate and structure profile data
-        validation_prompt = self._create_validation_prompt(form_data)
+    def collect_and_validate_profile(self, form_data: dict, manager_context: dict) -> dict:
+        # Validate profile data with Manager Agent oversight
+        validation_prompt = self._create_validation_prompt(form_data, manager_context)
         response = self.step(validation_prompt)
-        return self._parse_validation_response(response)
+        
+        # Report back to Manager Agent
+        validation_result = self._parse_validation_response(response)
+        if self.manager_agent:
+            self.manager_agent.receive_agent_update('profile_collector', validation_result)
+        
+        return validation_result
+    
+    def request_manager_guidance(self, issue: str, context: dict) -> dict:
+        # Request guidance from Manager Agent for complex decisions
+        if self.manager_agent:
+            return self.manager_agent.provide_guidance('profile_collector', issue, context)
+        return {}
+    
+    def collaborate_with_memory_agent(self, user_id: str, profile_data: dict):
+        # Coordinate with Memory Agent through Manager Agent
+        if self.manager_agent:
+            self.manager_agent.coordinate_agent_collaboration(
+                'profile_collector', 'memory', 
+                {'action': 'store_profile', 'user_id': user_id, 'data': profile_data}
+            )
 ```
 
 **Interface:**
 ```typescript
 interface ProfileCollectorAgent {
-  collectBasicInfo(): Promise<BasicProfileForm>
-  validateProfileData(data: ProfileData): ValidationResult
+  collectBasicInfo(managerContext: ManagerContext): Promise<BasicProfileForm>
+  validateProfileData(data: ProfileData, managerContext: ManagerContext): ValidationResult
   structureProfileData(rawData: FormData): StructuredProfile
-  updateSharedContext(profile: StructuredProfile): Promise<void>
+  requestManagerGuidance(issue: string, context: any): Promise<ManagerGuidance>
+  collaborateWithMemoryAgent(userId: string, profileData: ProfileData): Promise<void>
 }
 ```
 
 ### 3. Assessment Agent (CAMEL.AI)
 
-**Purpose:** Generate and conduct personality/career assessments using CAMEL framework
+**Purpose:** Generate and conduct personality/career assessments under Manager Agent coordination
 
 **CAMEL Implementation:**
 ```python
 class AssessmentAgent(ChatAgent):
-    def __init__(self):
+    def __init__(self, manager_agent=None):
         system_message = BaseMessage.make_assistant_message(
             role_name="Assessment Specialist",
-            content="You are a psychological assessment expert who creates personalized career and personality assessments."
+            content="You are a specialized psychological assessment expert working under a Manager Agent. You create personalized career and personality assessments while coordinating with other agents through the Manager Agent."
         )
         super().__init__(system_message)
+        self.manager_agent = manager_agent
     
-    def generate_personalized_questions(self, profile_context: dict) -> list:
-        # Use CAMEL agent to generate contextual assessment questions
-        generation_prompt = self._create_question_generation_prompt(profile_context)
+    def generate_personalized_questions(self, profile_context: dict, manager_guidance: dict) -> list:
+        # Generate questions with Manager Agent coordination
+        generation_prompt = self._create_question_generation_prompt(profile_context, manager_guidance)
         response = self.step(generation_prompt)
-        return self._parse_questions(response)
+        questions = self._parse_questions(response)
+        
+        # Report to Manager Agent
+        if self.manager_agent:
+            self.manager_agent.receive_agent_update('assessment', {
+                'action': 'questions_generated',
+                'count': len(questions),
+                'context': profile_context
+            })
+        
+        return questions
     
-    def score_and_interpret(self, responses: list) -> dict:
-        # Use CAMEL agent for intelligent scoring and interpretation
-        scoring_prompt = self._create_scoring_prompt(responses)
+    def score_and_interpret(self, responses: list, collaborative_context: dict) -> dict:
+        # Score with input from other agents via Manager Agent
+        scoring_prompt = self._create_scoring_prompt(responses, collaborative_context)
         response = self.step(scoring_prompt)
-        return self._parse_assessment_results(response)
+        results = self._parse_assessment_results(response)
+        
+        # Coordinate with Analysis Agent through Manager Agent
+        if self.manager_agent:
+            self.manager_agent.coordinate_agent_collaboration(
+                'assessment', 'analysis',
+                {'assessment_results': results, 'user_responses': responses}
+            )
+        
+        return results
+    
+    def collaborate_in_role_playing(self, society_session, profile_data: dict):
+        # Participate in CAMEL role-playing society for collaborative assessment
+        return society_session.participate_as_specialist(self, profile_data)
 ```
 
 **Interface:**
 ```typescript
 interface AssessmentAgent {
-  generateQuestions(profileContext: ProfileContext): Promise<Question[]>
-  conductAssessment(questions: Question[]): Promise<AssessmentSession>
-  scoreAssessment(responses: Response[]): AssessmentResults
+  generateQuestions(profileContext: ProfileContext, managerGuidance: ManagerGuidance): Promise<Question[]>
+  conductAssessment(questions: Question[], collaborativeContext: CollaborativeContext): Promise<AssessmentSession>
+  scoreAssessment(responses: Response[], collaborativeContext: CollaborativeContext): AssessmentResults
   interpretResults(scores: AssessmentResults): PersonalityProfile
+  collaborateInRolePlaying(societySession: RolePlayingSession, profileData: ProfileData): Promise<CollaborativeResult>
 }
 ```
 

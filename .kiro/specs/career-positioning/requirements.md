@@ -59,40 +59,68 @@ The Career Positioning feature is the core functionality of EzWorking that addre
 
 ### Requirement 5
 
-**User Story:** As a job seeker, I want to interact with specialized AI agents that collaborate to provide comprehensive career guidance, so that I receive expert-level assistance in different aspects of career positioning.
+**User Story:** As a user, I want to interact with a Manager Agent that coordinates multiple specialized agents to provide comprehensive career assistance, so that I receive expert guidance through intelligent multi-agent collaboration.
 
 #### Acceptance Criteria
 
-1. WHEN a user starts the career positioning process THEN the system SHALL initialize multiple specialized agents: Profile Collector Agent, Assessment Agent, Analysis Agent, and Recommendation Agent
-2. WHEN Profile Collector Agent gathers user data THEN it SHALL structure and validate information before passing to other agents
-3. WHEN Assessment Agent generates questions THEN it SHALL create personalized assessments based on profile data and coordinate with Analysis Agent
-4. WHEN Analysis Agent processes results THEN it SHALL generate comprehensive personality and career profiles using multi-agent collaboration
-5. WHEN Recommendation Agent suggests positions THEN it SHALL coordinate with Analysis Agent to ensure recommendations align with user profile
-6. WHEN agents interact THEN they SHALL maintain shared context and communicate findings through structured inter-agent messaging
-7. WHEN user interacts with the system THEN the appropriate specialized agent SHALL respond while maintaining context from other agents
+1. WHEN a user sends any message THEN the system SHALL use a Manager Agent to analyze user intent and coordinate appropriate specialized agents
+2. WHEN user intent matches career positioning workflow THEN the Manager Agent SHALL orchestrate collaboration between Profile Collector, Assessment, Analysis, and Recommendation agents
+3. WHEN user intent is general inquiry THEN the Manager Agent SHALL delegate to the Conversation Agent while maintaining oversight
+4. WHEN user is in a structured workflow THEN the Manager Agent SHALL coordinate agent handoffs and maintain workflow continuity
+5. WHEN agents need to collaborate THEN the Manager Agent SHALL facilitate inter-agent communication and data sharing
+6. WHEN providing any response THEN the Manager Agent SHALL coordinate streaming output from appropriate agents for real-time user feedback
+7. WHEN user asks workflow-related questions THEN the Manager Agent SHALL explain available processes and coordinate agent responses
 
 ### Requirement 6
 
-**User Story:** As a job seeker, I want to finalize my career direction through intelligent agent coordination, so that I have clear and well-reasoned job search targets.
+**User Story:** As a user, I want to experience seamless transitions between structured workflows and conversational assistance, so that I can get help in the most natural and efficient way.
 
 #### Acceptance Criteria
 
-1. WHEN user completes position preference selection THEN the Recommendation Agent SHALL coordinate with Analysis Agent to synthesize final career directions
-2. WHEN synthesizing career directions THEN agents SHALL collaborate to generate 1-5 directions based on complete multi-agent analysis
-3. WHEN generating final directions THEN agents SHALL consider all collected data: profile, assessment, analysis, and preferences through inter-agent communication
-4. WHEN career directions are finalized THEN the system SHALL present them with reasoning from multiple agent perspectives
-5. WHEN user reviews directions THEN agents SHALL provide collaborative explanations showing how different aspects led to recommendations
-6. WHEN user confirms career direction THEN all agents SHALL update their shared knowledge base for future interactions
+1. WHEN user is in career positioning workflow THEN they SHALL be able to ask general questions without losing workflow progress
+2. WHEN user asks questions during workflow THEN the system SHALL provide contextual answers while maintaining workflow state
+3. WHEN user wants to pause or resume workflow THEN the system SHALL save progress and allow seamless continuation
+4. WHEN user completes structured workflow THEN the system SHALL transition to conversational mode while retaining workflow results
+5. WHEN user requests workflow restart or modification THEN the system SHALL accommodate while preserving relevant previous data
+6. WHEN providing any assistance THEN all responses SHALL be delivered via streaming for real-time interaction
 
 ### Requirement 7
 
-**User Story:** As a system administrator, I want the multi-agent system to maintain consistency and coordination, so that users receive coherent and reliable career guidance.
+**User Story:** As a user, I want AI responses to be delivered in appropriate formats combining conversational and visual elements, so that I can interact naturally while viewing structured information clearly.
 
 #### Acceptance Criteria
 
-1. WHEN agents communicate THEN the system SHALL ensure message passing follows defined protocols and data structures
-2. WHEN agents share context THEN the system SHALL maintain data consistency across all agent memories
-3. WHEN multiple agents process user data THEN the system SHALL coordinate to prevent conflicts and ensure coherent responses
-4. WHEN an agent completes its task THEN it SHALL properly hand off context to the next agent in the workflow
-5. WHEN system encounters errors THEN agents SHALL coordinate recovery and maintain user session continuity
-6. WHEN user session ends THEN all agents SHALL persist their knowledge to shared storage for future sessions
+1. WHEN any agent generates conversational responses THEN it SHALL stream the output token by token in real-time
+2. WHEN system provides structured data like assessments or job recommendations THEN it SHALL render them as interactive cards or visual components
+3. WHEN system streams assessment questions THEN it SHALL display them as interactive quiz cards with answer options
+4. WHEN system provides job recommendations THEN it SHALL render them as detailed job cards with visual elements
+5. WHEN system shows analysis results THEN it SHALL combine streaming explanations with visual charts and infographics
+6. WHEN user interacts with cards THEN the system SHALL provide conversational feedback about their selections
+7. WHEN streaming is interrupted THEN the system SHALL gracefully handle reconnection and resume streaming
+
+### Requirement 8
+
+**User Story:** As a job seeker, I want the system to maintain a comprehensive memory of my career journey and preferences, so that I receive personalized assistance based on my complete profile and history.
+
+#### Acceptance Criteria
+
+1. WHEN I interact with the system THEN it SHALL maintain persistent memory of my personal information, career preferences, and job search progress
+2. WHEN I complete assessments or workflows THEN the system SHALL update my career profile memory with new insights and preferences
+3. WHEN I save job positions or express preferences THEN the system SHALL remember my interests and use them for future recommendations
+4. WHEN I return to the system THEN it SHALL recall my previous interactions, progress, and preferences to provide continualized assistance
+5. WHEN agents need user information THEN they SHALL access the centralized user memory for consistent and up-to-date data
+6. WHEN my information changes THEN the system SHALL update the memory and notify relevant agents of the changes
+7. WHEN I request my data THEN the system SHALL provide a comprehensive view of all stored career-related information
+
+### Requirement 9
+
+**User Story:** As a system administrator, I want the multi-agent system to be coordinated by a Manager Agent that ensures consistency and proper collaboration protocols, so that users receive coherent and reliable assistance.
+
+#### Acceptance Criteria
+
+1. WHEN Manager Agent processes user input THEN it SHALL accurately analyze requirements and delegate to appropriate specialized agents
+2. WHEN agents communicate THEN the Manager Agent SHALL facilitate message passing and ensure protocols are followed
+3. WHEN user switches between workflows and general chat THEN the Manager Agent SHALL maintain context consistency and coordinate smooth transitions
+4. WHEN multiple agents need to collaborate THEN the Manager Agent SHALL orchestrate their interactions to prevent conflicts and ensure coherent responses
+5. WHEN system encounters errors THEN the Manager Agent SHALL coordinate recovery efforts and maintain user session continuity
+6. WHEN user session ends THEN the Manager Agent SHALL ensure all agents persist their knowledge to shared storage for future sessions
