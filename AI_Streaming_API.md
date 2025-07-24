@@ -51,6 +51,7 @@ data: {"finished": true}
 | `normal` | 通常模式 | 显示在普通对话区域 |
 | `form` | 表单模式 | 渲染为表单组件 |
 | `recommendation` | 推荐模式 | 渲染为推荐结果 |
+| `evaluation` | 测评模式 | 渲染为测评界面 |
 
 ### 状态码说明
 - `200` - 成功，开始流式响应
