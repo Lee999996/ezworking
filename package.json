@@ -1,0 +1,65 @@
+{
+  "name": "saas-ui-pro",
+  "description": "Saas UI Pro utilities, components and blocks",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/saas-js/saas-ui-pro.git"
+  },
+  "author": "Eelco Wiersma <eelco@saas-ui.dev>",
+  "license": "https://saas-ui.dev/license",
+  "private": true,
+  "scripts": {
+    "prepare": "husky install",
+    "dev:demo": "yarn workspace demo dev",
+    "dev:my-new-app": "yarn workspace my-new-app dev",
+    "dev:ezworking": "yarn workspace ezworking dev",
+    "build": "turbo run build --filter='@saas-ui-pro/*' --filter=demo",
+    "build:demo": "yarn workspace web build",
+    "build:tokens": "chakra-cli tokens apps/demo/src/theme/index.ts",
+    "clean:packages": "turbo run clean",
+    "eslint": "eslint --cache --cache-location=node_modules/.cache/.eslintcache --fix",
+    "format:check": "prettier --check apps/** --check packages/**",
+    "format:write": "prettier --write apps/** --check packages/**",
+    "lint": "yarn run eslint . --ext .js,.jsx,.ts,.tsx",
+    "lint:staged": "lint-staged --allow-empty --config lint-staged.config.js",
+    "typecheck": "tsc --noEmit",
+    "build:packages": "turbo run build --filter='@saas-ui-pro/*' --concurrency=5 --continue",
+    "storybook": "yarn workspace saas-ui-storybook-pro dev",
+    "publish": "yarn workspaces foreach -W --from '@saas-ui-pro/*' npm publish --access public && yarn changeset tag",
+    "publish:next": "yarn workspaces foreach -W --from '@saas-ui-pro/*' npm publish --tag next --access public && yarn changeset tag"
+  },
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "devDependencies": {
+    "@chakra-ui/cli": "^2.5.6",
+    "@changesets/cli": "^2.27.9",
+    "@trivago/prettier-plugin-sort-imports": "^4.3.0",
+    "@types/node": "^18.19.59",
+    "@types/react": "18.3.12",
+    "@types/react-dom": "18.3.1",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^8.10.0",
+    "eslint-import-resolver-typescript": "^3.6.3",
+    "eslint-plugin-cypress": "^2.15.2",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-react": "^7.37.3",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.3.0",
+    "prettier": "^3.3.3",
+    "rimraf": "^4.4.1",
+    "ts-node": "^10.9.2",
+    "turbo": "^2.2.3",
+    "typescript": "^5.6.3"
+  },
+  "resolutions": {
+    "react-inspector": "^6.0.1",
+    "@mdx-js/react": "^2.1.5",
+    "react-element-to-jsx-string": "^15.0.0"
+  },
+  "packageManager": "yarn@4.5.1"
+}

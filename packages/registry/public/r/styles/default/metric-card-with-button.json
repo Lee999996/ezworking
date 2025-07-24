@@ -1,0 +1,28 @@
+{
+  "name": "metric-card-with-button",
+  "type": "registry:block",
+  "version": "1.1.0",
+  "private": true,
+  "description": "A metric card that displays a KPI metric with a label, value, icon, difference and view reports button.",
+  "dependencies": [
+    "@chakra-ui/react",
+    "@chakra-ui/utils",
+    "@saas-ui/react",
+    "react-icons"
+  ],
+  "files": [
+    {
+      "path": "blocks/kpi-cards/metric-card-with-button/metric-card-with-button.tsx",
+      "content": "import * as React from 'react'\n\nimport {\n  Box,\n  Button,\n  Card,\n  CardBody,\n  Flex,\n  HStack,\n  Icon,\n  Stat,\n  StatHelpText,\n  StatLabel,\n  StatNumber,\n} from '@chakra-ui/react'\nimport { IconBadge } from '@saas-ui/react'\nimport {\n  LuChevronDown,\n  LuChevronRight,\n  LuChevronUp,\n  LuMousePointer,\n  LuUsers,\n  LuWallet,\n} from 'react-icons/lu'\n\nconst getIcon = (metric: string) => {\n  switch (metric) {\n    case 'active-users':\n      return <LuUsers />\n    case 'sales':\n      return <LuWallet />\n    case 'avg-click-rate':\n      return <LuMousePointer />\n    default:\n      return null\n  }\n}\n\nexport interface MetricCardProps {\n  id: string\n  label: string\n  value: string\n  difference: string\n  isPositive: boolean\n}\n\nexport const MetricCard: React.FC<MetricCardProps> = (props) => {\n  const { id, label, value, difference, isPositive } = props\n  return (\n    <Card flex=\"1\">\n      <CardBody position=\"relative\">\n        <Stat>\n          <StatLabel color=\"muted\">{label}</StatLabel>\n          <StatNumber>{value}</StatNumber>\n          <StatHelpText color=\"muted\">\n            {isPositive ? (\n              <Flex alignItems=\"center\" gap=\"1\">\n                <Icon as={LuChevronUp} color=\"green.500\" />{' '}\n                <Box as=\"span\" color=\"green.500\" fontWeight=\"medium\">\n                  {difference}\n                </Box>\n                more than last week\n              </Flex>\n            ) : (\n              <Flex alignItems=\"center\" gap=\"1\">\n                <Icon as={LuChevronDown} color=\"red.500\" />{' '}\n                <Box as=\"span\" color=\"red.500\" fontWeight=\"medium\">\n                  {difference}\n                </Box>\n                less than last week\n              </Flex>\n            )}\n          </StatHelpText>\n          <IconBadge\n            position=\"absolute\"\n            top=\"0\"\n            right=\"0\"\n            size=\"lg\"\n            variant=\"solid\"\n            bg=\"gray.200\"\n            color=\"inherit\"\n            _dark={{\n              bg: 'whiteAlpha.300',\n            }}\n          >\n            {getIcon(id)}\n          </IconBadge>\n        </Stat>\n      </CardBody>\n      <Button\n        rightIcon={<LuChevronRight />}\n        borderTopRadius=\"0\"\n        justifyContent=\"space-between\"\n        fontWeight=\"medium\"\n        h=\"10\"\n        px=\"4\"\n        bg=\"gray.50\"\n        _hover={{ bg: 'gray.100' }}\n        _dark={{\n          bg: 'whiteAlpha.50',\n          _hover: {\n            bg: 'whiteAlpha.100',\n          },\n        }}\n      >\n        View reports\n      </Button>\n    </Card>\n  )\n}\n",
+      "type": "registry:component"
+    },
+    {
+      "path": "blocks/kpi-cards/metric-card-with-button/metric-card-with-button.stories.tsx",
+      "content": "import * as React from 'react'\n\nimport { HStack } from '@chakra-ui/react'\nimport type { Meta } from '@storybook/react'\n\nimport { MetricCard } from './metric-card-with-button.js'\n\nexport default {\n  title: 'Blocks/KPI Cards/MetricCardWithButton',\n  decorators: [(Story) => <Story />],\n} as Meta\n\nconst metrics = [\n  {\n    id: 'active-users',\n    label: 'Active users',\n    value: '1,294',\n    difference: '12.4%',\n    isPositive: true,\n  },\n  {\n    id: 'sales',\n    label: 'Sales',\n    value: '$ 28,294',\n    difference: '4%',\n    isPositive: false,\n  },\n  {\n    id: 'avg-click-rate',\n    label: 'Avg. click rate',\n    value: '1,294',\n    difference: '12.4%',\n    isPositive: true,\n  },\n]\n\nexport const Default = () => (\n  <HStack p=\"8\">\n    {metrics.map((metric) => (\n      <MetricCard key={metric.label} {...metric} />\n    ))}\n  </HStack>\n)\n",
+      "type": "registry:story"
+    }
+  ],
+  "canvas": {
+    "center": true
+  }
+}

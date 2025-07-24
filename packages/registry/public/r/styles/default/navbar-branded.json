@@ -1,0 +1,28 @@
+{
+  "name": "navbar-branded",
+  "type": "registry:block",
+  "version": "1.1.0",
+  "private": false,
+  "description": "Navbar with brand background color.",
+  "dependencies": [
+    "@chakra-ui/react",
+    "@chakra-ui/utils",
+    "@saas-ui/react",
+    "react-icons"
+  ],
+  "files": [
+    {
+      "path": "blocks/stacked-layouts/navbar-branded/navbar-branded.tsx",
+      "content": "import {\n  IconButton,\n  Menu,\n  MenuButton,\n  MenuDivider,\n  MenuGroup,\n  MenuItem,\n  MenuList,\n} from '@chakra-ui/react'\nimport { SaasUIIcon } from '@saas-ui/assets'\nimport {\n  AppShell,\n  Navbar,\n  NavbarBrand,\n  NavbarContent,\n  NavbarItem,\n  NavbarLink,\n  PersonaAvatar,\n} from '@saas-ui/react'\nimport { LuBell } from 'react-icons/lu'\n\nexport const NavbarBranded: React.FC<React.PropsWithChildren> = (props) => {\n  return (\n    <AppShell\n      variant=\"static\"\n      height=\"480px\"\n      navbar={\n        <Navbar position=\"sticky\" colorScheme=\"primary\">\n          <NavbarBrand>\n            <SaasUIIcon width=\"24px\" color=\"currentColor\" />\n          </NavbarBrand>\n          <NavbarContent display={{ base: 'hidden', sm: 'flex' }}>\n            <NavbarItem>\n              <NavbarLink href=\"#\">Inbox</NavbarLink>\n            </NavbarItem>\n            <NavbarItem>\n              <NavbarLink isActive href=\"#\">\n                Contacts\n              </NavbarLink>\n            </NavbarItem>\n            <NavbarItem>\n              <NavbarLink href=\"#\">Tasks</NavbarLink>\n            </NavbarItem>\n          </NavbarContent>\n          <NavbarContent as=\"div\" justifyContent=\"end\" spacing=\"2\">\n            <NavbarItem>\n              <NavbarLink href=\"#\">Help</NavbarLink>\n            </NavbarItem>\n            <NavbarItem>\n              <IconButton\n                variant=\"outline\"\n                isRound\n                aria-label=\"Notifications\"\n                size=\"xs\"\n                _hover={{\n                  bgColor: 'sidebar-on-muted',\n                }}\n                _active={{\n                  bgColor: 'sidebar-on-subtle',\n                }}\n              >\n                <LuBell size=\"1.2em\" />\n              </IconButton>\n            </NavbarItem>\n            <Menu>\n              <MenuButton>\n                <PersonaAvatar\n                  src=\"/showcase-avatar.jpg\"\n                  name=\"Beatriz\"\n                  size=\"xs\"\n                  presence=\"online\"\n                />\n              </MenuButton>\n              <MenuList color=\"chakra-body-text\">\n                <MenuGroup title=\"beatriz@saas-ui.dev\">\n                  <MenuItem>Profile</MenuItem>\n                  <MenuItem>Settings</MenuItem>\n                  <MenuItem>Help &amp; feedback</MenuItem>\n                </MenuGroup>\n                <MenuDivider />\n                <MenuItem>Log out</MenuItem>\n              </MenuList>\n            </Menu>\n          </NavbarContent>\n        </Navbar>\n      }\n    >\n      {props.children}\n    </AppShell>\n  )\n}\n",
+      "type": "registry:component"
+    },
+    {
+      "path": "blocks/stacked-layouts/navbar-branded/navbar-branded.stories.tsx",
+      "content": "import * as React from 'react'\n\nimport { Skeleton, SkeletonText, Stack } from '@chakra-ui/react'\nimport { Page, PageBody, PageHeader } from '@saas-ui-pro/react'\nimport type { Meta } from '@storybook/react'\n\nimport { NavbarBranded } from './navbar-branded.js'\n\nexport default {\n  title: 'Blocks/StackedLayouts/NavbarBranded',\n} as Meta\n\nexport const Default = () => (\n  <NavbarBranded>\n    <Page>\n      <PageHeader title=\"Contacts\"></PageHeader>\n      <PageBody>\n        <Stack spacing=\"4\" mb=\"14\" pt=\"10\">\n          <Skeleton width=\"100px\" height=\"24px\" speed={0} />\n          <SkeletonText speed={0} />\n        </Stack>\n        <Stack direction=\"row\" spacing=\"8\" mb=\"14\">\n          <Stack spacing=\"4\" flex=\"1\">\n            <Skeleton width=\"100px\" height=\"20px\" speed={0} />\n            <SkeletonText speed={0} />\n          </Stack>\n          <Stack spacing=\"4\" flex=\"1\">\n            <Skeleton width=\"100px\" height=\"20px\" speed={0} />\n            <SkeletonText speed={0} />\n          </Stack>\n        </Stack>\n        <Stack direction=\"row\" spacing=\"8\" mb=\"14\">\n          <Stack spacing=\"4\" flex=\"1\">\n            <Skeleton width=\"100px\" height=\"20px\" speed={0} />\n            <SkeletonText speed={0} />\n          </Stack>\n          <Stack spacing=\"4\" flex=\"1\">\n            <Skeleton width=\"100px\" height=\"20px\" speed={0} />\n            <SkeletonText speed={0} />\n          </Stack>\n        </Stack>\n        <Stack direction=\"row\" spacing=\"8\">\n          <Stack spacing=\"4\" flex=\"1\">\n            <Skeleton width=\"100px\" height=\"20px\" speed={0} />\n            <SkeletonText speed={0} />\n          </Stack>\n          <Stack spacing=\"4\" flex=\"1\">\n            <Skeleton width=\"100px\" height=\"20px\" speed={0} />\n            <SkeletonText speed={0} />\n          </Stack>\n        </Stack>\n      </PageBody>\n    </Page>\n  </NavbarBranded>\n)\n",
+      "type": "registry:story"
+    }
+  ],
+  "canvas": {
+    "center": true
+  }
+}

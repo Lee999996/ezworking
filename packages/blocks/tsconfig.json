@@ -1,0 +1,14 @@
+{
+  "extends": "@tsconfig/recommended",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "module": "Preserve",
+    "target": "ES2021",
+    "moduleResolution": "Bundler",
+    "allowSyntheticDefaultImports": true,
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "customConditions": ["sui", "sui-pro"]
+  }
+}

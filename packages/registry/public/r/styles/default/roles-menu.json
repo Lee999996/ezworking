@@ -1,0 +1,29 @@
+{
+  "name": "roles-menu",
+  "type": "registry:block",
+  "version": "1.1.0",
+  "private": false,
+  "description": "A menu for switching roles.",
+  "dependencies": [
+    "@chakra-ui/react",
+    "@chakra-ui/utils",
+    "@saas-ui/react",
+    "react-icons"
+  ],
+  "files": [
+    {
+      "path": "blocks/menus/roles-menu/roles-menu.tsx",
+      "content": "import * as React from 'react'\n\nimport {\n  Button,\n  Icon,\n  Menu,\n  MenuButton,\n  MenuItemOption,\n  MenuList,\n  MenuOptionGroup,\n  Text,\n  useControllableState,\n} from '@chakra-ui/react'\nimport { FiCheck } from 'react-icons/fi'\n\nexport interface RolesMenuProps {\n  defaultValue?: string\n  value?: string\n  onChange?: (value: string) => void\n}\n\nexport const RolesMenu: React.FC<RolesMenuProps> = (props) => {\n  const [role, setRole] = useControllableState({\n    defaultValue: props.defaultValue,\n    value: props.value,\n    onChange: props.onChange,\n  })\n\n  const roles = [\n    {\n      label: 'User',\n      value: 'user',\n      description: 'Standard access to view and interactive with content.',\n    },\n    {\n      label: 'Moderator',\n      value: 'moderator',\n      description: 'Abilitity to moderate content and manage users.',\n    },\n    {\n      label: 'Admin',\n      value: 'admin',\n      description: 'Full access to manage content, users, and settings.',\n    },\n  ]\n\n  const selectedRole = roles.find((r) => r.value === role) ?? roles[0]\n\n  return (\n    <Menu defaultIsOpen closeOnSelect={false}>\n      <MenuButton as={Button}>{selectedRole.label}</MenuButton>\n      <MenuList maxW=\"280px\">\n        <MenuOptionGroup\n          title=\"Roles\"\n          color=\"muted\"\n          fontWeight=\"medium\"\n          mt=\"0\"\n          type=\"radio\"\n          value={role}\n          onChange={(value) => setRole(value as string)}\n        >\n          {roles.map(({ label, value, description }) => (\n            <MenuItemOption\n              key={value}\n              value={value}\n              icon={null}\n              position=\"relative\"\n              pe=\"8\"\n            >\n              <Text fontWeight=\"medium\" mb=\"1\">\n                {label}\n              </Text>\n              <Text fontSize=\"xs\" color=\"gray.500\">\n                {description}\n              </Text>\n              {value === role && (\n                <Icon\n                  as={FiCheck}\n                  fontSize=\"1.2em\"\n                  position=\"absolute\"\n                  top=\"2.5\"\n                  right=\"2.5\"\n                />\n              )}\n            </MenuItemOption>\n          ))}\n        </MenuOptionGroup>\n      </MenuList>\n    </Menu>\n  )\n}\n",
+      "type": "registry:component"
+    },
+    {
+      "path": "blocks/menus/roles-menu/roles-menu.stories.tsx",
+      "content": "import * as React from 'react'\n\nimport type { Meta } from '@storybook/react'\n\nimport { RolesMenu } from './roles-menu.js'\n\nexport default {\n  title: 'Blocks/Menus/RolesMenu',\n} as Meta\n\nexport const Default = () => <RolesMenu defaultValue=\"user\" />\n",
+      "type": "registry:story"
+    }
+  ],
+  "canvas": {
+    "center": true,
+    "height": "480px"
+  }
+}

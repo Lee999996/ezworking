@@ -1,0 +1,28 @@
+{
+  "name": "latest-messages-card",
+  "type": "registry:block",
+  "version": "1.1.0",
+  "description": "A card that displays the latest messages",
+  "dependencies": [
+    "@chakra-ui/react",
+    "@chakra-ui/utils",
+    "@saas-ui/react",
+    "react-icons"
+  ],
+  "files": [
+    {
+      "path": "blocks/communication/latest-messages-card/latest-messages-card.tsx",
+      "content": "import * as React from 'react'\n\nimport {\n  Card,\n  CardBody,\n  CardHeader,\n  Heading,\n  IconButton,\n  Menu,\n  MenuButton,\n  MenuItem,\n  MenuList,\n  Text,\n} from '@chakra-ui/react'\nimport {\n  PersonaAvatar,\n  StructuredList,\n  StructuredListCell,\n  StructuredListItem,\n} from '@saas-ui/react'\nimport { LuMoreVertical } from 'react-icons/lu'\n\nexport interface LatestMessagesCardProps {\n  items: Array<{\n    name: string\n    avatar: string\n    date: string\n    message: string\n    presence: string\n    unread: boolean\n  }>\n}\n\nexport function LatestMessagesCard(props: LatestMessagesCardProps) {\n  const { items } = props\n\n  return (\n    <Card size=\"sm\">\n      <CardHeader borderBottomWidth=\"1px\">\n        <Heading size=\"xs\" fontWeight=\"medium\">\n          Latest messages\n        </Heading>\n      </CardHeader>\n      <CardBody p=\"0\">\n        <StructuredList pb=\"0\">\n          {items.map((item, i) => (\n            <StructuredListItem key={i} href=\"#\">\n              <StructuredListCell px=\"2\">\n                <PersonaAvatar\n                  presence={item.presence}\n                  name={item.name}\n                  src={item.avatar}\n                  size=\"sm\"\n                />\n              </StructuredListCell>\n              <StructuredListCell flex=\"1\" px=\"2\">\n                <Heading\n                  as=\"h4\"\n                  size=\"xs\"\n                  mb=\"0.5\"\n                  fontWeight=\"medium\"\n                  display=\"flex\"\n                  alignItems=\"center\"\n                  sx={\n                    item.unread\n                      ? {\n                          fontWeight: 'bold',\n                          _before: {\n                            content: '\"\"',\n                            display: 'inline-block',\n                            verticalAlign: 'middle',\n                            borderRadius: 'full',\n                            position: 'relative',\n                            boxSize: '2',\n                            bg: 'blue.500',\n                            me: 2,\n                          },\n                        }\n                      : {}\n                  }\n                >\n                  {item.name}\n                </Heading>\n                <Text\n                  color={item.unread ? 'inherit' : 'muted'}\n                  fontSize=\"xs\"\n                  noOfLines={1}\n                >\n                  {item.message}\n                </Text>\n              </StructuredListCell>\n              <StructuredListCell>\n                <Text color=\"muted\" fontSize=\"xs\">\n                  {item.date}\n                </Text>\n              </StructuredListCell>\n              <StructuredListCell px=\"2\">\n                <Menu>\n                  <MenuButton\n                    as={IconButton}\n                    size=\"xs\"\n                    variant=\"ghost\"\n                    icon={<LuMoreVertical />}\n                  />\n                  <MenuList>\n                    <MenuItem>Reply</MenuItem>\n                  </MenuList>\n                </Menu>\n              </StructuredListCell>\n            </StructuredListItem>\n          ))}\n          <StructuredListItem\n            bg=\"gray.50\"\n            _dark={{\n              bg: 'gray.700',\n            }}\n            borderBottomRadius=\"md\"\n            mt=\"2\"\n            href=\"#\"\n          >\n            <Text flex=\"1\" textAlign=\"center\" fontSize=\"sm\">\n              View all messages\n            </Text>\n          </StructuredListItem>\n        </StructuredList>\n      </CardBody>\n    </Card>\n  )\n}\n",
+      "type": "registry:component"
+    },
+    {
+      "path": "blocks/communication/latest-messages-card/latest-messages-card.stories.tsx",
+      "content": "import * as React from 'react'\n\nimport { Container } from '@chakra-ui/react'\nimport { Meta } from '@storybook/react'\n\nimport { LatestMessagesCard } from './latest-messages-card.js'\n\nexport default {\n  title: 'Blocks/Communication/LatestMessagesCard',\n  decorators: [\n    (Story) => (\n      <Container>\n        <Story />\n      </Container>\n    ),\n  ],\n} as Meta\n\nconst messages = [\n  {\n    name: 'Jane Fonda',\n    avatar: '/avatars/12.jpg',\n    date: '2 days ago',\n    message: 'Looking forward to our meeting!',\n    presence: 'online',\n    unread: true,\n  },\n  {\n    name: 'Dianne Russell',\n    avatar: '/avatars/11.jpg',\n    date: '16 Jan 2024',\n    message: 'Can you send the file?',\n    presence: 'dnd',\n    unread: false,\n  },\n  {\n    name: 'Courtney Henry',\n    avatar: '/avatars/10.jpg',\n    date: '3 Jan 2024',\n    message: 'See you at 7pm!',\n    presence: 'busy',\n    unread: false,\n  },\n]\n\nexport const Default = () => <LatestMessagesCard items={messages} />\n",
+      "type": "registry:story"
+    }
+  ],
+  "canvas": {
+    "center": true,
+    "maxWidth": "480px"
+  }
+}

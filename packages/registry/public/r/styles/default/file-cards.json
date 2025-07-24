@@ -1,0 +1,28 @@
+{
+  "name": "file-cards",
+  "type": "registry:block",
+  "version": "1.1.0",
+  "private": true,
+  "description": "A list of file card with a preview, icon and metadata",
+  "dependencies": [
+    "@chakra-ui/react",
+    "@chakra-ui/utils",
+    "@saas-ui/react",
+    "react-icons"
+  ],
+  "files": [
+    {
+      "path": "blocks/drawers/add-contact-drawer/add-contact-drawer.tsx",
+      "content": "import * as React from 'react'\nimport {\n  Button,\n  Drawer,\n  DrawerBody,\n  DrawerCloseButton,\n  DrawerContent,\n  DrawerFooter,\n  DrawerHeader,\n  DrawerOverlay,\n  HStack,\n  Text,\n  useDisclosure,\n  forwardRef,\n  Avatar,\n} from '@chakra-ui/react'\nimport {\n  FileUpload,\n  FileUploadTrigger,\n  FileUploadDropzone,\n} from '@saas-ui/file-upload'\nimport { Form, FormLayout, SubmitButton, createField } from '@saas-ui/forms'\n\nexport interface AddUserAddUserDrawerProps {\n  /**\n   * This is only required to run this demo and should be removed in your implementation.\n   */\n  getRootNode?: () => HTMLElement\n  children: React.ReactNode\n}\n\nexport const AddContactDrawer: React.FC<AddUserAddUserDrawerProps> = (\n  props,\n) => {\n  const disclosure = useDisclosure({\n    defaultIsOpen: true,\n  })\n\n  const onSubmit = () => {}\n\n  return (\n    <>\n      <Button onClick={() => disclosure.onOpen()}>Add contact</Button>\n\n      {/* Remove blockScrollOnMount in your implementation */}\n      <Drawer {...disclosure} blockScrollOnMount={false}>\n        <DrawerOverlay />\n        <Form onSubmit={onSubmit}>\n          {({ Field }) => (\n            <DrawerContent>\n              <DrawerCloseButton />\n              <DrawerHeader>Add contact</DrawerHeader>\n\n              <DrawerBody>\n                <FormLayout>\n                  <ProfileImageField\n                    name=\"profileImage\"\n                    label=\"Photo\"\n                    getRootNode={props.getRootNode}\n                  />\n                  <Field name=\"name\" label=\"Name\" isRequired />\n                  <Field\n                    name=\"email\"\n                    label=\"Email address\"\n                    type=\"email\"\n                    isRequired\n                  />\n                  <Field name=\"company\" label=\"Company\" />\n                  <Field\n                    name=\"about\"\n                    label=\"About\"\n                    type=\"textarea\"\n                    help=\"Max 100 words.\"\n                  />\n                  <Field\n                    name=\"type\"\n                    label=\"Type\"\n                    type=\"radio\"\n                    options={[\n                      { label: 'Lead', value: 'lead' },\n                      { label: 'Customer', value: 'customer' },\n                    ]}\n                  />\n                </FormLayout>\n              </DrawerBody>\n\n              <DrawerFooter alignItems=\"flex-end\">\n                <Button variant=\"secondary\" mr={3} onClick={disclosure.onClose}>\n                  Cancel\n                </Button>\n                <SubmitButton>Create</SubmitButton>\n              </DrawerFooter>\n            </DrawerContent>\n          )}\n        </Form>\n      </Drawer>\n    </>\n  )\n}\n\nconst ProfileImageField = createField(\n  forwardRef((props, ref) => {\n    const { onChange, ...rest } = props\n\n    const [preview, setPreview] = React.useState<string | undefined>()\n\n    return (\n      <FileUpload\n        maxFileSize={1024 * 1024}\n        accept=\"image/*\"\n        {...rest}\n        onFilesChange={(files) => {\n          if (files.acceptedFiles?.length) {\n            onChange(files.acceptedFiles[0])\n          }\n        }}\n        maxFiles={1}\n        inputRef={ref}\n      >\n        {({ files, deleteFile, createFileUrl }) => {\n          React.useEffect(() => {\n            if (files[0]) {\n              createFileUrl(files[0], setPreview)\n            }\n          }, [files[0]])\n          return (\n            <HStack spacing=\"4\">\n              <Avatar size=\"lg\" src={preview || props.value} />\n              <FileUploadDropzone border=\"0\" p=\"0\">\n                {!files?.length ? (\n                  <FileUploadTrigger as={Button}>Upload</FileUploadTrigger>\n                ) : (\n                  <HStack>\n                    <Text fontSize=\"sm\">{files[0].name}</Text>\n                    <Button\n                      onClick={(e) => {\n                        e.stopPropagation()\n                        deleteFile(files[0])\n                      }}\n                    >\n                      Clear\n                    </Button>\n                  </HStack>\n                )}\n              </FileUploadDropzone>\n            </HStack>\n          )\n        }}\n      </FileUpload>\n    )\n  }),\n  {\n    isControlled: true,\n  },\n)\n",
+      "type": "registry:component"
+    },
+    {
+      "path": "blocks/drawers/add-contact-drawer/add-contact-drawer.stories.tsx",
+      "content": "import * as React from 'react'\nimport { Meta } from '@storybook/react'\n\nexport default {\n  title: 'Blocks/Drawers/AddContact',\n  decorators: [(Story) => <Story />],\n} as Meta\n\nexport { AddContactDrawer } from './add-contact-drawer'\n",
+      "type": "registry:story"
+    }
+  ],
+  "canvas": {
+    "center": true
+  }
+}

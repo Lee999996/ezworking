@@ -1,0 +1,28 @@
+{
+  "name": "metric-card-simple",
+  "type": "registry:block",
+  "version": "1.1.0",
+  "private": true,
+  "description": "A metric card that displays a KPI metric with a label, value and difference.",
+  "dependencies": [
+    "@chakra-ui/react",
+    "@chakra-ui/utils",
+    "@saas-ui/react",
+    "react-icons"
+  ],
+  "files": [
+    {
+      "path": "blocks/kpi-cards/metric-card-simple/metric-card-simple.tsx",
+      "content": "import * as React from 'react'\n\nimport {\n  Box,\n  Card,\n  CardBody,\n  Flex,\n  Icon,\n  Stat,\n  StatHelpText,\n  StatLabel,\n  StatNumber,\n} from '@chakra-ui/react'\nimport { LuChevronDown, LuChevronUp } from 'react-icons/lu'\n\nexport interface MetricCardProps {\n  label: string\n  value: string\n  difference: string\n  isPositive: boolean\n}\n\nexport const MetricCard: React.FC<MetricCardProps> = (props) => {\n  const { label, value, difference, isPositive } = props\n  return (\n    <Card flex=\"1\">\n      <CardBody position=\"relative\">\n        <Stat>\n          <StatLabel color=\"muted\">{label}</StatLabel>\n          <StatNumber display=\"inline-block\" me=\"2\">\n            {value}\n          </StatNumber>\n          <StatHelpText color=\"muted\" display=\"inline-block\">\n            {isPositive ? (\n              <Flex alignItems=\"center\">\n                <Icon as={LuChevronUp} color=\"green.500\" />{' '}\n                <Box as=\"span\" color=\"green.500\" fontWeight=\"medium\">\n                  {difference}\n                </Box>\n              </Flex>\n            ) : (\n              <Flex alignItems=\"center\">\n                <Icon as={LuChevronDown} color=\"red.500\" />{' '}\n                <Box as=\"span\" color=\"red.500\" fontWeight=\"medium\">\n                  {difference}\n                </Box>\n              </Flex>\n            )}\n          </StatHelpText>\n        </Stat>\n      </CardBody>\n    </Card>\n  )\n}\n",
+      "type": "registry:component"
+    },
+    {
+      "path": "blocks/kpi-cards/metric-card-simple/metric-card-simple.stories.tsx",
+      "content": "import * as React from 'react'\n\nimport { HStack } from '@chakra-ui/react'\nimport type { Meta } from '@storybook/react'\n\nimport { MetricCard } from './metric-card-simple.js'\n\nexport default {\n  title: 'Blocks/KPI Cards/MetricCardSimple',\n  decorators: [(Story) => <Story />],\n} as Meta\n\nconst metrics = [\n  {\n    id: 'active-users',\n    label: 'Active users',\n    value: '676',\n    difference: '12.4%',\n    isPositive: true,\n  },\n  {\n    id: 'revenue',\n    label: 'Revenue',\n    value: '$ 29,294',\n    difference: '21%',\n    isPositive: false,\n  },\n  {\n    id: 'avg-click-rate',\n    label: 'Avg. click rate',\n    value: '14%',\n    difference: '5%',\n    isPositive: true,\n  },\n]\n\nexport const Default = () => (\n  <HStack p=\"8\">\n    {metrics.map((metric) => (\n      <MetricCard key={metric.label} {...metric} />\n    ))}\n  </HStack>\n)\n",
+      "type": "registry:story"
+    }
+  ],
+  "canvas": {
+    "center": true
+  }
+}

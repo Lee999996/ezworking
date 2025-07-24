@@ -1,0 +1,28 @@
+{
+  "name": "integration-card",
+  "type": "registry:block",
+  "version": "1.1.0",
+  "private": false,
+  "description": "A card for displaying an integration.",
+  "dependencies": [
+    "@chakra-ui/react",
+    "@chakra-ui/utils",
+    "@saas-ui/react",
+    "react-icons"
+  ],
+  "files": [
+    {
+      "path": "blocks/settings/integration-card/integration-card.tsx",
+      "content": "import React from 'react'\n\nimport {\n  Button,\n  ButtonGroup,\n  Card,\n  CardBody,\n  CardFooter,\n  CardHeader,\n  HStack,\n  Heading,\n  Icon,\n  Text,\n  VStack,\n} from '@chakra-ui/react'\nimport { IconBadge } from '@saas-ui/react'\nimport { FiExternalLink, FiLink } from 'react-icons/fi'\n\nexport type IntegrationCardProps = {\n  name: string\n  type: string\n  description: string\n  icon: any\n  docs: string\n  isConnected?: boolean\n}\n\nexport const IntegrationCard: React.FC<IntegrationCardProps> = (props) => {\n  return (\n    <Card>\n      <CardHeader>\n        <HStack spacing=\"2\" alignItems=\"flex-start\">\n          <IconBadge\n            icon={<Icon as={props.icon} color=\"white\" />}\n            bg=\"black\"\n            variant=\"solid\"\n            size=\"md\"\n          />\n\n          <VStack alignItems=\"flex-start\" spacing=\"0\" lineHeight=\"1.2\">\n            <Heading size=\"sm\" fontWeight=\"medium\">\n              {props.name}\n            </Heading>\n            <Text color=\"muted\" fontSize=\"sm\">\n              {props.type}\n            </Text>\n          </VStack>\n        </HStack>\n      </CardHeader>\n      <CardBody py=\"0\">\n        <Text color=\"muted\" fontSize=\"sm\">\n          {props.description}\n        </Text>\n      </CardBody>\n      <CardFooter>\n        <ButtonGroup spacing=\"2\">\n          {!props.isConnected ? (\n            <Button variant=\"primary\" leftIcon={<Icon as={FiLink} />}>\n              Connect\n            </Button>\n          ) : (\n            <Button variant=\"secondary\">Disconnect</Button>\n          )}\n          <Button variant=\"ghost\" leftIcon={<Icon as={FiExternalLink} />}>\n            Docs\n          </Button>\n        </ButtonGroup>\n      </CardFooter>\n    </Card>\n  )\n}\n",
+      "type": "registry:component"
+    },
+    {
+      "path": "blocks/settings/integration-card/integration-card.stories.tsx",
+      "content": "import React from 'react'\n\nimport { SimpleGrid } from '@chakra-ui/react'\nimport type { Meta } from '@storybook/react'\nimport { FaGithub, FaX } from 'react-icons/fa6'\n\nimport { IntegrationCard, IntegrationCardProps } from './integration-card.js'\n\nexport default {\n  title: 'Blocks/Settings/Integrations',\n} as Meta\n\nconst integrations: IntegrationCardProps[] = [\n  {\n    name: 'GitHub',\n    type: 'Free integration',\n    description:\n      'Track activity like pushes, issues, and pull requests from a GitHub repository.',\n    icon: FaGithub,\n    docs: '#',\n  },\n  {\n    name: 'X',\n    type: 'Free integration',\n    description:\n      'Follow activity like mentions, hashtags, and retweets from specific accounts.',\n    icon: FaX,\n    docs: '#',\n    isConnected: true,\n  },\n]\n\nexport const Default = () => {\n  return (\n    <SimpleGrid columns={2} spacing=\"4\">\n      {integrations.map((integration) => (\n        <IntegrationCard key={integration.name} {...integration} />\n      ))}\n    </SimpleGrid>\n  )\n}\n",
+      "type": "registry:story"
+    }
+  ],
+  "canvas": {
+    "center": true
+  }
+}

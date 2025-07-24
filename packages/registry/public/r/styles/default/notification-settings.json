@@ -1,0 +1,28 @@
+{
+  "name": "notification-settings",
+  "type": "registry:block",
+  "version": "1.1.0",
+  "private": false,
+  "description": "Settings section for managing notifications.",
+  "dependencies": [
+    "@chakra-ui/react",
+    "@chakra-ui/utils",
+    "@saas-ui/react",
+    "react-icons"
+  ],
+  "files": [
+    {
+      "path": "blocks/settings/notification-settings/notification-settings.tsx",
+      "content": "import {\n  Card,\n  CardHeader,\n  Divider,\n  FormLabel,\n  Heading,\n  Switch,\n  Text,\n} from '@chakra-ui/react'\nimport {\n  StructuredList,\n  StructuredListCell,\n  StructuredListHeader,\n  StructuredListItem,\n} from '@saas-ui/react'\n\ninterface NotificationItemProps {\n  title: string\n  name: string\n  description?: string\n  isChecked?: boolean\n  defaultChecked?: boolean\n  onChange?: (checked: boolean) => void\n}\n\nconst NotificationItem: React.FC<NotificationItemProps> = (props) => {\n  const { title, name, description, defaultChecked, isChecked, onChange } =\n    props\n  return (\n    <StructuredListItem>\n      <StructuredListCell flex=\"1\">\n        <FormLabel\n          htmlFor={name}\n          size=\"sm\"\n          fontWeight=\"normal\"\n          m=\"0\"\n          userSelect=\"none\"\n        >\n          {title}\n        </FormLabel>\n        {description ? (\n          <Text color=\"muted\" size=\"sm\">\n            {description}\n          </Text>\n        ) : null}\n      </StructuredListCell>\n      <StructuredListCell>\n        <Switch\n          id={name}\n          defaultChecked={defaultChecked}\n          isChecked={isChecked}\n          onChange={(e) => onChange?.(!!e.target.value)}\n        />\n      </StructuredListCell>\n    </StructuredListItem>\n  )\n}\n\nexport function NotificationSettings() {\n  return (\n    <Card minW=\"400px\">\n      <CardHeader>\n        <Heading size=\"sm\" fontWeight=\"semibold\">\n          Notifications\n        </Heading>\n      </CardHeader>\n      <StructuredList>\n        <StructuredListHeader fontWeight=\"regular\" fontSize=\"sm\" px=\"4\">\n          Contacts\n        </StructuredListHeader>\n        <NotificationItem\n          name=\"lead-added\"\n          title=\"A new lead is added.\"\n          defaultChecked\n        />\n        <NotificationItem\n          name=\"account-upgraded\"\n          title=\"An account has upgraded.\"\n        />\n      </StructuredList>\n      <Divider />\n      <StructuredList>\n        <StructuredListHeader fontWeight=\"regular\" fontSize=\"sm\" px=\"4\">\n          Inbox\n        </StructuredListHeader>\n        <NotificationItem\n          name=\"assigned\"\n          title=\"A message is assigned to me.\"\n        />\n        <NotificationItem\n          name=\"mentioned\"\n          title=\"Somebody mentions me.\"\n          defaultChecked\n        />\n      </StructuredList>\n    </Card>\n  )\n}\n",
+      "type": "registry:component"
+    },
+    {
+      "path": "blocks/settings/notification-settings/notification-settings.stories.tsx",
+      "content": "import React from 'react'\n\nimport type { Meta } from '@storybook/react'\n\nimport { NotificationSettings } from './notification-settings.js'\n\nexport default {\n  title: 'Blocks/Settings/Notifications',\n} as Meta\n\nexport const Default = () => <NotificationSettings />\n",
+      "type": "registry:story"
+    }
+  ],
+  "canvas": {
+    "center": true
+  }
+}

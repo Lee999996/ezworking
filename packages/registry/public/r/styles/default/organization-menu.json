@@ -1,0 +1,29 @@
+{
+  "name": "organization-menu",
+  "type": "registry:block",
+  "version": "1.1.0",
+  "private": false,
+  "description": "A menu for switching organizations.",
+  "dependencies": [
+    "@chakra-ui/react",
+    "@chakra-ui/utils",
+    "@saas-ui/react",
+    "react-icons"
+  ],
+  "files": [
+    {
+      "path": "blocks/menus/organization-menu/organization-menu.tsx",
+      "content": "import * as React from 'react'\n\nimport {\n  Button,\n  Icon,\n  Menu,\n  MenuButton,\n  MenuDivider,\n  MenuGroup,\n  MenuItem,\n  MenuList,\n  Text,\n} from '@chakra-ui/react'\nimport { IconBadge } from '@saas-ui/react'\nimport { FaMagento, FaPaypal, FaSpotify } from 'react-icons/fa6'\nimport { FiCheck, FiPlus, FiPower, FiSettings } from 'react-icons/fi'\n\nexport const OrganizationMenu: React.FC = () => {\n  const [currentOrg, setOrg] = React.useState('paypal')\n\n  const orgs = [\n    {\n      name: 'Paypal',\n      slug: 'paypal',\n      plan: 'Free plan',\n      icon: FaPaypal,\n      color: '#00457C',\n    },\n    {\n      name: 'Spotify',\n      slug: 'spotify',\n      plan: 'Trial',\n      icon: FaSpotify,\n      color: '#1ED760',\n    },\n    {\n      name: 'Magento',\n      slug: 'magento',\n      plan: 'Professional plan',\n      icon: FaMagento,\n      color: '#000000',\n    },\n  ]\n\n  const selected = orgs.find((r) => r.slug === currentOrg) ?? orgs[0]\n\n  return (\n    <Menu defaultIsOpen closeOnSelect={false}>\n      <MenuButton\n        as={Button}\n        variant=\"ghost\"\n        leftIcon={\n          <IconBadge\n            bg={selected.color}\n            variant=\"solid\"\n            size=\"sm\"\n            boxSize=\"5\"\n            icon={<Icon as={selected.icon} color=\"white\" />}\n          />\n        }\n      >\n        {selected.name}\n      </MenuButton>\n      <MenuList maxW=\"280px\">\n        <MenuGroup\n          title=\"Organizations\"\n          color=\"muted\"\n          fontWeight=\"medium\"\n          mt=\"0\"\n        >\n          {orgs.map(({ name, slug, plan, icon, color }) => (\n            <MenuItem\n              key={slug}\n              value={slug}\n              icon={\n                <IconBadge\n                  bg={color}\n                  variant=\"solid\"\n                  icon={<Icon as={icon} color=\"white\" />}\n                />\n              }\n              position=\"relative\"\n              pe=\"8\"\n              onClick={() => setOrg(slug)}\n            >\n              <Text fontWeight=\"medium\">{name}</Text>\n              <Text fontSize=\"xs\" color=\"gray.500\">\n                {plan}\n              </Text>\n              {slug === currentOrg && (\n                <Icon\n                  as={FiCheck}\n                  fontSize=\"1.2em\"\n                  position=\"absolute\"\n                  top=\"2.5\"\n                  right=\"2.5\"\n                />\n              )}\n            </MenuItem>\n          ))}\n        </MenuGroup>\n        <MenuDivider />\n        <MenuGroup>\n          <MenuItem icon={<Icon as={FiSettings} fontSize=\"1.2em\" />}>\n            Organization settings\n          </MenuItem>\n          <MenuItem icon={<Icon as={FiPlus} fontSize=\"1.2em\" />}>\n            Add organization\n          </MenuItem>\n        </MenuGroup>\n        <MenuDivider />\n        <MenuGroup>\n          <MenuItem icon={<Icon as={FiPower} fontSize=\"1.2em\" />}>\n            Log out\n          </MenuItem>\n        </MenuGroup>\n      </MenuList>\n    </Menu>\n  )\n}\n",
+      "type": "registry:component"
+    },
+    {
+      "path": "blocks/menus/organization-menu/organization-menu.stories.tsx",
+      "content": "import * as React from 'react'\n\nimport type { Meta } from '@storybook/react'\n\nimport { OrganizationMenu } from './organization-menu.js'\n\nexport default {\n  title: 'Blocks/Menus/OrganizationMenu',\n} as Meta\n\nexport const Default = () => <OrganizationMenu />\n",
+      "type": "registry:story"
+    }
+  ],
+  "canvas": {
+    "center": true,
+    "height": "480px"
+  }
+}

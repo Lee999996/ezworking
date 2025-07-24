@@ -1,0 +1,76 @@
+{
+  "name": "@saas-ui/cli",
+  "author": "Eelco Wiersma <eelco@saas-ui.dev>",
+  "description": "Saas UI command line",
+  "type": "module",
+  "version": "0.0.1",
+  "files": [
+    "lib"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
+  "bin": {
+    "__cli_bash_complete": "lib/bash-complete.js",
+    "sui": "lib/cli.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "imports": {
+    "#*": [
+      "./src/*",
+      "./src/*.ts"
+    ]
+  },
+  "scripts": {
+    "prebuild": "tsc -p src/tsconfig.json",
+    "build": "dotenvx run -f .env.production -- tsup",
+    "build:dev": "dotenvx run -f .env.local -- tsup",
+    "prepublishOnly": "npm run build",
+    "postinstall:dev": "sui install",
+    "dev": "dotenvx run -f .env.local -- tsx --tsconfig src/tsconfig.json src/bin/cli.ts"
+  },
+  "dependencies": {
+    "@antfu/ni": "^0.23.0",
+    "@babel/core": "^7.26.0",
+    "@babel/parser": "^7.26.2",
+    "@babel/plugin-transform-typescript": "^7.25.7",
+    "@hono/node-server": "^1.13.2",
+    "@stricli/auto-complete": "^1.0.0",
+    "@stricli/core": "^1.0.0",
+    "@supabase/supabase-js": "^2.45.4",
+    "chalk": "^5.3.0",
+    "cosmiconfig": "^9.0.0",
+    "deepmerge": "^4.3.1",
+    "execa": "^9.4.1",
+    "fast-glob": "^3.3.2",
+    "fs-extra": "^11.2.0",
+    "hono": "^4.6.5",
+    "https-proxy-agent": "^7.0.5",
+    "kleur": "^4.1.5",
+    "lodash.template": "^4.5.0",
+    "node-fetch": "^3.3.2",
+    "open": "^10.1.0",
+    "ora": "^8.1.0",
+    "prompts": "^2.4.2",
+    "recast": "^0.23.9",
+    "rimraf": "^6.0.1",
+    "stringify-object": "^5.0.0",
+    "ts-morph": "^24.0.0",
+    "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.19.2",
+    "type-fest": "^4.26.1",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@dotenvx/dotenvx": "^1.20.0",
+    "@tsconfig/node20": "^20.1.4",
+    "@types/lodash.template": "^4.5.3",
+    "@types/node": "20.x",
+    "@types/prompts": "^2.4.9",
+    "@types/stringify-object": "^4.0.5",
+    "tsup": "^8.5.0",
+    "typescript": "^5.6.3"
+  }
+}

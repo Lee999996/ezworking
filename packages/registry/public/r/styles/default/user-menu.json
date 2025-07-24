@@ -1,0 +1,29 @@
+{
+  "name": "user-menu",
+  "type": "registry:block",
+  "version": "1.1.0",
+  "private": false,
+  "description": "A menu that displays the logged in user information and actions.",
+  "dependencies": [
+    "@chakra-ui/react",
+    "@chakra-ui/utils",
+    "@saas-ui/react",
+    "react-icons"
+  ],
+  "files": [
+    {
+      "path": "blocks/menus/user-menu/user-menu.tsx",
+      "content": "import * as React from 'react'\n\nimport {\n  Button,\n  Menu,\n  MenuButton,\n  MenuDivider,\n  MenuGroup,\n  MenuItem,\n  MenuList,\n  Stack,\n  Text,\n} from '@chakra-ui/react'\nimport { PersonaAvatar } from '@saas-ui/react'\n\nexport const UserMenu = () => {\n  const user = {\n    name: 'Renata Alink',\n    email: 'renata@alink.com',\n    avatar: 'https://saas-ui.dev/showcase-avatar.jpg',\n    presence: 'online',\n  }\n\n  return (\n    <Menu defaultIsOpen>\n      <MenuButton as={Button}>{user.name}</MenuButton>\n      <MenuList>\n        <MenuGroup\n          title=\"Signed in as\"\n          fontWeight=\"medium\"\n          color=\"muted\"\n          mt=\"0\"\n        >\n          <MenuItem\n            icon={\n              <PersonaAvatar\n                size=\"sm\"\n                name={user.name}\n                src={user.avatar}\n                presence={user.presence}\n              />\n            }\n          >\n            <Stack spacing=\"0\">\n              <Text>{user.name}</Text>\n              <Text fontSize=\"sm\" color=\"muted\">\n                {user.email}\n              </Text>\n            </Stack>\n          </MenuItem>\n        </MenuGroup>\n        <MenuDivider />\n        <MenuGroup>\n          <MenuItem>Profile</MenuItem>\n          <MenuItem>Settings</MenuItem>\n        </MenuGroup>\n        <MenuDivider />\n        <MenuGroup>\n          <MenuItem>Changelog</MenuItem>\n          <MenuItem>Help</MenuItem>\n          <MenuItem>Feedback</MenuItem>\n        </MenuGroup>\n        <MenuDivider />\n        <MenuGroup>\n          <MenuItem>Sign out</MenuItem>\n        </MenuGroup>\n      </MenuList>\n    </Menu>\n  )\n}\n",
+      "type": "registry:component"
+    },
+    {
+      "path": "blocks/menus/user-menu/user-menu.stories.tsx",
+      "content": "import * as React from 'react'\n\nimport type { Meta } from '@storybook/react'\n\nimport { UserMenu } from './user-menu.js'\n\nexport default {\n  title: 'Blocks/Menus/UserMenu',\n} as Meta\n\nexport const Default = () => <UserMenu />\n",
+      "type": "registry:story"
+    }
+  ],
+  "canvas": {
+    "center": true,
+    "height": "480px"
+  }
+}

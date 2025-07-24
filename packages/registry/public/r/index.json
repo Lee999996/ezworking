@@ -1,0 +1,774 @@
+[
+  {
+    "name": "task-card-with-properties",
+    "type": "registry:block",
+    "version": "1.1.0",
+    "private": true,
+    "description": "A task card with properties",
+    "dependencies": [
+      "@chakra-ui/react",
+      "@chakra-ui/utils",
+      "@saas-ui/react",
+      "react-icons"
+    ],
+    "files": [
+      {
+        "path": "blocks/cards/task-card-with-properties/task-card-with-properties.tsx",
+        "type": "registry:component"
+      },
+      {
+        "path": "blocks/cards/task-card-with-properties/task-card-with-properties.stories.tsx",
+        "type": "registry:story"
+      }
+    ],
+    "category": "Application",
+    "subcategory": "Cards",
+    "canvas": {
+      "center": true,
+      "maxWidth": "380px"
+    }
+  },
+  {
+    "name": "chat-details",
+    "type": "registry:block",
+    "version": "1.1.0",
+    "description": "A panel with chat bubbles",
+    "dependencies": [
+      "@chakra-ui/react",
+      "@chakra-ui/utils",
+      "@saas-ui/react",
+      "react-icons"
+    ],
+    "files": [
+      {
+        "path": "blocks/communication/chat-details/chat-details.tsx",
+        "type": "registry:component"
+      },
+      {
+        "path": "blocks/communication/chat-details/chat-details.stories.tsx",
+        "type": "registry:story"
+      }
+    ],
+    "category": "Application",
+    "subcategory": "Communication",
+    "canvas": {
+      "center": true
+    }
+  },
+  {
+    "name": "latest-messages-card",
+    "type": "registry:block",
+    "version": "1.1.0",
+    "description": "A card that displays the latest messages",
+    "dependencies": [
+      "@chakra-ui/react",
+      "@chakra-ui/utils",
+      "@saas-ui/react",
+      "react-icons"
+    ],
+    "files": [
+      {
+        "path": "blocks/communication/latest-messages-card/latest-messages-card.tsx",
+        "type": "registry:component"
+      },
+      {
+        "path": "blocks/communication/latest-messages-card/latest-messages-card.stories.tsx",
+        "type": "registry:story"
+      }
+    ],
+    "category": "Application",
+    "subcategory": "Communication",
+    "canvas": {
+      "center": true,
+      "maxWidth": "480px"
+    }
+  },
+  {
+    "name": "add-contact-drawer",
+    "type": "registry:block",
+    "version": "1.1.0",
+    "private": true,
+    "description": "Drawer with a form to add a new contact",
+    "dependencies": [
+      "@chakra-ui/react",
+      "@chakra-ui/utils",
+      "@saas-ui/react",
+      "react-icons"
+    ],
+    "files": [
+      {
+        "path": "blocks/drawers/add-contact-drawer/add-contact-drawer.tsx",
+        "type": "registry:component"
+      },
+      {
+        "path": "blocks/drawers/add-contact-drawer/add-contact-drawer.stories.tsx",
+        "type": "registry:story"
+      }
+    ],
+    "category": "Application",
+    "subcategory": "Drawers",
+    "canvas": {
+      "center": true,
+      "height": "800px"
+    }
+  },
+  {
+    "name": "file-cards",
+    "type": "registry:block",
+    "version": "1.1.0",
+    "private": true,
+    "description": "A list of file card with a preview, icon and metadata",
+    "dependencies": [
+      "@chakra-ui/react",
+      "@chakra-ui/utils",
+      "@saas-ui/react",
+      "react-icons"
+    ],
+    "files": [
+      {
+        "path": "blocks/drawers/add-contact-drawer/add-contact-drawer.tsx",
+        "type": "registry:component"
+      },
+      {
+        "path": "blocks/drawers/add-contact-drawer/add-contact-drawer.stories.tsx",
+        "type": "registry:story"
+      }
+    ],
+    "category": "Application",
+    "subcategory": "Files",
+    "canvas": {
+      "center": true
+    }
+  },
+  {
+    "name": "files-list-card",
+    "type": "registry:block",
+    "version": "1.1.0",
+    "private": true,
+    "description": "A card that displays a list of files with an icon, name, size, and modified date",
+    "dependencies": [
+      "@chakra-ui/react",
+      "@chakra-ui/utils",
+      "@saas-ui/react",
+      "react-icons"
+    ],
+    "files": [
+      {
+        "path": "blocks/drawers/add-contact-drawer/add-contact-drawer.tsx",
+        "type": "registry:component"
+      },
+      {
+        "path": "blocks/drawers/add-contact-drawer/add-contact-drawer.stories.tsx",
+        "type": "registry:story"
+      }
+    ],
+    "category": "Application",
+    "subcategory": "Files",
+    "canvas": {
+      "center": true
+    }
+  },
+  {
+    "name": "metric-card-simple",
+    "type": "registry:block",
+    "version": "1.1.0",
+    "private": true,
+    "description": "A metric card that displays a KPI metric with a label, value and difference.",
+    "dependencies": [
+      "@chakra-ui/react",
+      "@chakra-ui/utils",
+      "@saas-ui/react",
+      "react-icons"
+    ],
+    "files": [
+      {
+        "path": "blocks/kpi-cards/metric-card-simple/metric-card-simple.tsx",
+        "type": "registry:component"
+      },
+      {
+        "path": "blocks/kpi-cards/metric-card-simple/metric-card-simple.stories.tsx",
+        "type": "registry:story"
+      }
+    ],
+    "category": "Application",
+    "subcategory": "KPI Cards",
+    "canvas": {
+      "center": true
+    }
+  },
+  {
+    "name": "metric-card-with-button",
+    "type": "registry:block",
+    "version": "1.1.0",
+    "private": true,
+    "description": "A metric card that displays a KPI metric with a label, value, icon, difference and view reports button.",
+    "dependencies": [
+      "@chakra-ui/react",
+      "@chakra-ui/utils",
+      "@saas-ui/react",
+      "react-icons"
+    ],
+    "files": [
+      {
+        "path": "blocks/kpi-cards/metric-card-with-button/metric-card-with-button.tsx",
+        "type": "registry:component"
+      },
+      {
+        "path": "blocks/kpi-cards/metric-card-with-button/metric-card-with-button.stories.tsx",
+        "type": "registry:story"
+      }
+    ],
+    "category": "Application",
+    "subcategory": "KPI Cards",
+    "canvas": {
+      "center": true
+    }
+  },
+  {
+    "name": "metric-card-with-icon",
+    "type": "registry:block",
+    "version": "1.1.0",
+    "private": true,
+    "description": "A metric card that displays a KPI metric with a label, value, difference and icon.",
+    "dependencies": [
+      "@chakra-ui/react",
+      "@chakra-ui/utils",
+      "@saas-ui/react",
+      "react-icons"
+    ],
+    "files": [
+      {
+        "path": "blocks/kpi-cards/metric-card-with-icon/metric-card-with-icon.tsx",
+        "type": "registry:component"
+      },
+      {
+        "path": "blocks/kpi-cards/metric-card-with-icon/metric-card-with-icon.stories.tsx",
+        "type": "registry:story"
+      }
+    ],
+    "category": "Application",
+    "subcategory": "KPI Cards",
+    "canvas": {
+      "center": true
+    }
+  },
+  {
+    "name": "sortable-task-list",
+    "type": "registry:block",
+    "version": "1.1.0",
+    "private": true,
+    "description": "A list of tasks with drag and drop sorting.",
+    "dependencies": [
+      "@chakra-ui/react",
+      "@chakra-ui/utils",
+      "@saas-ui/react",
+      "react-icons"
+    ],
+    "files": [
+      {
+        "path": "blocks/lists/sortable-task-list/sortable-task-list.tsx",
+        "type": "registry:component"
+      },
+      {
+        "path": "blocks/lists/sortable-task-list/sortable-task-list.stories.tsx",
+        "type": "registry:story"
+      }
+    ],
+    "category": "Application",
+    "subcategory": "Lists",
+    "canvas": {
+      "center": true,
+      "height": "400px"
+    }
+  },
+  {
+    "name": "organization-menu",
+    "type": "registry:block",
+    "version": "1.1.0",
+    "private": false,
+    "description": "A menu for switching organizations.",
+    "dependencies": [
+      "@chakra-ui/react",
+      "@chakra-ui/utils",
+      "@saas-ui/react",
+      "react-icons"
+    ],
+    "files": [
+      {
+        "path": "blocks/menus/organization-menu/organization-menu.tsx",
+        "type": "registry:component"
+      },
+      {
+        "path": "blocks/menus/organization-menu/organization-menu.stories.tsx",
+        "type": "registry:story"
+      }
+    ],
+    "category": "Application",
+    "subcategory": "Menus",
+    "canvas": {
+      "center": true,
+      "height": "480px"
+    }
+  },
+  {
+    "name": "roles-menu",
+    "type": "registry:block",
+    "version": "1.1.0",
+    "private": false,
+    "description": "A menu for switching roles.",
+    "dependencies": [
+      "@chakra-ui/react",
+      "@chakra-ui/utils",
+      "@saas-ui/react",
+      "react-icons"
+    ],
+    "files": [
+      {
+        "path": "blocks/menus/roles-menu/roles-menu.tsx",
+        "type": "registry:component"
+      },
+      {
+        "path": "blocks/menus/roles-menu/roles-menu.stories.tsx",
+        "type": "registry:story"
+      }
+    ],
+    "category": "Application",
+    "subcategory": "Menus",
+    "canvas": {
+      "center": true,
+      "height": "480px"
+    }
+  },
+  {
+    "name": "user-menu",
+    "type": "registry:block",
+    "version": "1.1.0",
+    "private": false,
+    "description": "A menu that displays the logged in user information and actions.",
+    "dependencies": [
+      "@chakra-ui/react",
+      "@chakra-ui/utils",
+      "@saas-ui/react",
+      "react-icons"
+    ],
+    "files": [
+      {
+        "path": "blocks/menus/user-menu/user-menu.tsx",
+        "type": "registry:component"
+      },
+      {
+        "path": "blocks/menus/user-menu/user-menu.stories.tsx",
+        "type": "registry:story"
+      }
+    ],
+    "category": "Application",
+    "subcategory": "Menus",
+    "canvas": {
+      "center": true,
+      "height": "480px"
+    }
+  },
+  {
+    "name": "feedback-modal",
+    "type": "registry:block",
+    "version": "1.1.0",
+    "private": true,
+    "description": "A modal for providing feedback.",
+    "dependencies": [
+      "@chakra-ui/react",
+      "@chakra-ui/utils",
+      "@saas-ui/react",
+      "react-icons"
+    ],
+    "files": [
+      {
+        "path": "blocks/modals/feedback-modal/feedback-modal.tsx",
+        "type": "registry:component"
+      },
+      {
+        "path": "blocks/modals/feedback-modal/feedback-modal.stories.tsx",
+        "type": "registry:story"
+      }
+    ],
+    "category": "Application",
+    "subcategory": "Modals",
+    "canvas": {
+      "center": true,
+      "height": "540px"
+    }
+  },
+  {
+    "name": "invite-people-modal",
+    "type": "registry:block",
+    "version": "1.1.0",
+    "private": true,
+    "description": "A modal for inviting people to a workspace.",
+    "dependencies": [
+      "@chakra-ui/react",
+      "@chakra-ui/utils",
+      "@saas-ui/react",
+      "react-icons"
+    ],
+    "files": [
+      {
+        "path": "blocks/modals/invite-people-modal/invite-people-modal.tsx",
+        "type": "registry:component"
+      },
+      {
+        "path": "blocks/modals/invite-people-modal/invite-people-modal.stories.tsx",
+        "type": "registry:story"
+      }
+    ],
+    "category": "Application",
+    "subcategory": "Modals",
+    "canvas": {
+      "center": true,
+      "height": "500px"
+    }
+  },
+  {
+    "name": "manage-tags-modal",
+    "type": "registry:block",
+    "version": "1.1.0",
+    "private": true,
+    "description": "A modal for managing tags.",
+    "dependencies": [
+      "@chakra-ui/react",
+      "@chakra-ui/utils",
+      "@saas-ui/react",
+      "react-icons"
+    ],
+    "files": [
+      {
+        "path": "blocks/modals/manage-tags-modal/manage-tags-modal.tsx",
+        "type": "registry:component"
+      },
+      {
+        "path": "blocks/modals/manage-tags-modal/manage-tags-modal.stories.tsx",
+        "type": "registry:story"
+      }
+    ],
+    "category": "Application",
+    "subcategory": "Modals",
+    "canvas": {
+      "center": true,
+      "height": "840px"
+    }
+  },
+  {
+    "name": "select-users-modal",
+    "type": "registry:block",
+    "version": "1.1.0",
+    "private": true,
+    "description": "A modal for selecting users.",
+    "dependencies": [
+      "@chakra-ui/react",
+      "@chakra-ui/utils",
+      "@saas-ui/react",
+      "react-icons"
+    ],
+    "files": [
+      {
+        "path": "blocks/modals/select-users-modal/select-users-modal.tsx",
+        "type": "registry:component"
+      },
+      {
+        "path": "blocks/modals/select-users-modal/user-persona.tsx",
+        "type": "registry:component"
+      },
+      {
+        "path": "blocks/modals/select-users-modal/select-users-modal.stories.tsx",
+        "type": "registry:story"
+      }
+    ],
+    "category": "Application",
+    "subcategory": "Modals",
+    "canvas": {
+      "center": true,
+      "height": "840px"
+    }
+  },
+  {
+    "name": "integration-card",
+    "type": "registry:block",
+    "version": "1.1.0",
+    "private": false,
+    "description": "A card for displaying an integration.",
+    "dependencies": [
+      "@chakra-ui/react",
+      "@chakra-ui/utils",
+      "@saas-ui/react",
+      "react-icons"
+    ],
+    "files": [
+      {
+        "path": "blocks/settings/integration-card/integration-card.tsx",
+        "type": "registry:component"
+      },
+      {
+        "path": "blocks/settings/integration-card/integration-card.stories.tsx",
+        "type": "registry:story"
+      }
+    ],
+    "category": "Application",
+    "subcategory": "Settings",
+    "canvas": {
+      "center": true
+    }
+  },
+  {
+    "name": "notification-settings",
+    "type": "registry:block",
+    "version": "1.1.0",
+    "private": false,
+    "description": "Settings section for managing notifications.",
+    "dependencies": [
+      "@chakra-ui/react",
+      "@chakra-ui/utils",
+      "@saas-ui/react",
+      "react-icons"
+    ],
+    "files": [
+      {
+        "path": "blocks/settings/notification-settings/notification-settings.tsx",
+        "type": "registry:component"
+      },
+      {
+        "path": "blocks/settings/notification-settings/notification-settings.stories.tsx",
+        "type": "registry:story"
+      }
+    ],
+    "category": "Application",
+    "subcategory": "Settings",
+    "canvas": {
+      "center": true
+    }
+  },
+  {
+    "name": "workspace-members-settings",
+    "type": "registry:block",
+    "version": "1.1.0",
+    "private": false,
+    "description": "Settings section for managing workspace members.",
+    "dependencies": [
+      "@chakra-ui/react",
+      "@chakra-ui/utils",
+      "@saas-ui/react",
+      "react-icons"
+    ],
+    "files": [
+      {
+        "path": "blocks/settings/workspace-members-settings/workspace-members-settings.tsx",
+        "type": "registry:component"
+      },
+      {
+        "path": "blocks/settings/workspace-members-settings/workspace-members-settings.stories.tsx",
+        "type": "registry:story"
+      }
+    ],
+    "category": "Application",
+    "subcategory": "Settings",
+    "canvas": {
+      "center": true
+    }
+  },
+  {
+    "name": "double-sidebar",
+    "type": "registry:block",
+    "version": "1.1.0",
+    "private": false,
+    "description": "Double sidebar layout.",
+    "dependencies": [
+      "@chakra-ui/react",
+      "@chakra-ui/utils",
+      "@saas-ui/react",
+      "react-icons"
+    ],
+    "files": [
+      {
+        "path": "blocks/settings/workspace-members-settings/workspace-members-settings.tsx",
+        "type": "registry:component"
+      },
+      {
+        "path": "blocks/settings/workspace-members-settings/workspace-members-settings.stories.tsx",
+        "type": "registry:story"
+      }
+    ],
+    "category": "Application",
+    "subcategory": "Layouts",
+    "canvas": {
+      "center": true
+    }
+  },
+  {
+    "name": "recessed-sidebar",
+    "type": "registry:block",
+    "version": "1.1.0",
+    "private": false,
+    "description": "Recessed sidebar layout.",
+    "dependencies": [
+      "@chakra-ui/react",
+      "@chakra-ui/utils",
+      "@saas-ui/react",
+      "react-icons"
+    ],
+    "files": [
+      {
+        "path": "blocks/sidebar-layouts/recessed-sidebar/recessed-sidebar.tsx",
+        "type": "registry:component"
+      },
+      {
+        "path": "blocks/sidebar-layouts/recessed-sidebar/recessed-sidebar.stories.tsx",
+        "type": "registry:story"
+      }
+    ],
+    "category": "Application",
+    "subcategory": "Layouts",
+    "canvas": {
+      "center": true
+    }
+  },
+  {
+    "name": "recessed-sidebar-contrast",
+    "type": "registry:block",
+    "version": "1.1.0",
+    "private": false,
+    "description": "Recessed sidebar layout with contrast.",
+    "dependencies": [
+      "@chakra-ui/react",
+      "@chakra-ui/utils",
+      "@saas-ui/react",
+      "react-icons"
+    ],
+    "files": [
+      {
+        "path": "blocks/sidebar-layouts/recessed-sidebar-contrast/recessed-sidebar-contrast.tsx",
+        "type": "registry:component"
+      },
+      {
+        "path": "blocks/sidebar-layouts/recessed-sidebar-contrast/recessed-sidebar-contrast.stories.tsx",
+        "type": "registry:story"
+      }
+    ],
+    "category": "Application",
+    "subcategory": "Layouts",
+    "canvas": {
+      "center": true
+    }
+  },
+  {
+    "name": "sidebar-with-navbar",
+    "type": "registry:block",
+    "version": "1.1.0",
+    "private": false,
+    "description": "Sidebar layout with navbar.",
+    "dependencies": [
+      "@chakra-ui/react",
+      "@chakra-ui/utils",
+      "@saas-ui/react",
+      "react-icons"
+    ],
+    "files": [
+      {
+        "path": "blocks/sidebar-layouts/sidebar-with-navbar/sidebar-with-navbar.tsx",
+        "type": "registry:component"
+      },
+      {
+        "path": "blocks/sidebar-layouts/sidebar-with-navbar/sidebar-with-navbar.stories.tsx",
+        "type": "registry:story"
+      }
+    ],
+    "category": "Application",
+    "subcategory": "Layouts",
+    "canvas": {
+      "center": true
+    }
+  },
+  {
+    "name": "sortable-nav-group-items",
+    "type": "registry:block",
+    "version": "1.1.0",
+    "private": false,
+    "description": "Sortable nav group items.",
+    "dependencies": [
+      "@chakra-ui/react",
+      "@chakra-ui/utils",
+      "@saas-ui/react",
+      "react-icons",
+      "@dnd-kit/utilities",
+      "@dnd-kit/core",
+      "@dnd-kit/sortable"
+    ],
+    "files": [
+      {
+        "path": "blocks/sidebar-layouts/sortable-nav-group/sortable-nav-group.tsx",
+        "type": "registry:component"
+      },
+      {
+        "path": "blocks/sidebar-layouts/sortable-nav-group/sortable-nav-group.stories.tsx",
+        "type": "registry:story"
+      }
+    ],
+    "category": "Application",
+    "subcategory": "Layouts",
+    "canvas": {
+      "center": true
+    }
+  },
+  {
+    "name": "navbar-branded",
+    "type": "registry:block",
+    "version": "1.1.0",
+    "private": false,
+    "description": "Navbar with brand background color.",
+    "dependencies": [
+      "@chakra-ui/react",
+      "@chakra-ui/utils",
+      "@saas-ui/react",
+      "react-icons"
+    ],
+    "files": [
+      {
+        "path": "blocks/stacked-layouts/navbar-branded/navbar-branded.tsx",
+        "type": "registry:component"
+      },
+      {
+        "path": "blocks/stacked-layouts/navbar-branded/navbar-branded.stories.tsx",
+        "type": "registry:story"
+      }
+    ],
+    "category": "Application",
+    "subcategory": "Layouts",
+    "canvas": {
+      "center": true
+    }
+  },
+  {
+    "name": "navbar-tabs",
+    "type": "registry:block",
+    "version": "1.1.0",
+    "private": false,
+    "description": "Navbar with tabs.",
+    "dependencies": [
+      "@chakra-ui/react",
+      "@chakra-ui/utils",
+      "@saas-ui/react",
+      "react-icons"
+    ],
+    "files": [
+      {
+        "path": "blocks/stacked-layouts/navbar-tabs/navbar-tabs.tsx",
+        "type": "registry:component"
+      },
+      {
+        "path": "blocks/stacked-layouts/navbar-tabs/navbar-tabs.stories.tsx",
+        "type": "registry:story"
+      }
+    ],
+    "category": "Application",
+    "subcategory": "Layouts",
+    "canvas": {
+      "center": true
+    }
+  }
+]

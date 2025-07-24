@@ -1,0 +1,22 @@
+{
+  "name": "@saas-ui/registry",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx --watch src/serve.ts",
+    "build:registry": "tsx scripts/build-registry.ts"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "lodash.template": "^4.5.0",
+    "ts-morph": "^24.0.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@tsconfig/recommended": "^1.0.7",
+    "tsx": "^4.19.2"
+  }
+}

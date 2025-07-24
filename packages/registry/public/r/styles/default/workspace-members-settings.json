@@ -1,0 +1,28 @@
+{
+  "name": "workspace-members-settings",
+  "type": "registry:block",
+  "version": "1.1.0",
+  "private": false,
+  "description": "Settings section for managing workspace members.",
+  "dependencies": [
+    "@chakra-ui/react",
+    "@chakra-ui/utils",
+    "@saas-ui/react",
+    "react-icons"
+  ],
+  "files": [
+    {
+      "path": "blocks/settings/workspace-members-settings/workspace-members-settings.tsx",
+      "content": "import {\n  Box,\n  Button,\n  ButtonGroup,\n  Card,\n  CardHeader,\n  HStack,\n  Heading,\n  IconButton,\n  Menu,\n  MenuButton,\n  MenuItem,\n  MenuList,\n  Spacer,\n  Stack,\n  Tag,\n  Text,\n} from '@chakra-ui/react'\nimport {\n  PersonaAvatar,\n  SearchInput,\n  StructuredList,\n  StructuredListCell,\n  StructuredListIcon,\n  StructuredListItem,\n} from '@saas-ui/react'\nimport { FiMoreVertical } from 'react-icons/fi'\n\nexport interface Member {\n  name: string\n  email: string\n  status: string\n  avatar: string\n  presence?: 'online' | 'offline' | 'away'\n}\n\nexport interface WorkspaceMembersSettingsProps {\n  members: Array<Member>\n}\n\nexport function WorkspaceMembersSettings(props: WorkspaceMembersSettingsProps) {\n  return (\n    <Card>\n      <CardHeader>\n        <Stack spacing=\"1\">\n          <Heading size=\"sm\" fontWeight=\"semibold\">\n            Members\n          </Heading>\n          <Text color=\"muted\" fontSize=\"sm\">\n            Manage and invite your colleagues\n          </Text>\n        </Stack>\n      </CardHeader>\n      <ButtonGroup px=\"3\" py=\"3\" borderTopWidth=\"1px\">\n        <Box>\n          <SearchInput placeholder=\"Filter by name or email\" size=\"sm\" />\n        </Box>\n        <Spacer />\n        <Button colorScheme=\"primary\" variant=\"solid\">\n          Invite people\n        </Button>\n      </ButtonGroup>\n      <StructuredList>\n        {props.members.map((member) => (\n          <StructuredListItem\n            key={member.email}\n            py=\"4\"\n            borderBottomWidth=\"1px\"\n            sx={{ '&:last-of-type': { borderWidth: 0 } }}\n          >\n            <StructuredListIcon>\n              <PersonaAvatar\n                name={member.name}\n                presence={member.presence}\n                size=\"xs\"\n              />\n            </StructuredListIcon>\n            <StructuredListCell flex=\"1\" px=\"4\">\n              <Heading size=\"sm\">{member.name || member.email}</Heading>\n              <Text color=\"muted\" fontSize=\"sm\">\n                {member.name ? member.email : null}\n              </Text>\n            </StructuredListCell>\n            <StructuredListCell>\n              <HStack>\n                <Tag size=\"sm\">{member.status}</Tag>\n              </HStack>\n            </StructuredListCell>\n            <StructuredListCell>\n              <Menu>\n                <MenuButton\n                  as={IconButton}\n                  icon={<FiMoreVertical />}\n                  variant=\"ghost\"\n                  size=\"sm\"\n                  aria-label=\"More\"\n                />\n                <MenuList>\n                  <MenuItem>Remove</MenuItem>\n                </MenuList>\n              </Menu>\n            </StructuredListCell>\n          </StructuredListItem>\n        ))}\n      </StructuredList>\n    </Card>\n  )\n}\n",
+      "type": "registry:component"
+    },
+    {
+      "path": "blocks/settings/workspace-members-settings/workspace-members-settings.stories.tsx",
+      "content": "import React from 'react'\n\nimport type { Meta } from '@storybook/react'\n\nimport {\n  type Member,\n  WorkspaceMembersSettings,\n} from './workspace-members-settings.js'\n\nexport default {\n  title: 'Blocks/Settings/Workspace Members Settings',\n  decorators: [(Story) => <Story />],\n} as Meta\n\nconst members: Array<Member> = [\n  {\n    name: 'Renata Alink',\n    email: 'hello@saas-ui.dev',\n    presence: 'online',\n    status: 'owner',\n    avatar: '/showcase-avatar.jpg',\n  },\n  {\n    name: 'Selini Shanta',\n    email: 'selini@saas-ui.dev',\n    presence: 'offline',\n    status: 'invited',\n    avatar: '/showcase-avatar2.jpg',\n  },\n]\n\nexport const Default = () => <WorkspaceMembersSettings members={members} />\n",
+      "type": "registry:story"
+    }
+  ],
+  "canvas": {
+    "center": true
+  }
+}
