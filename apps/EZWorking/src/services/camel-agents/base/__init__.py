@@ -1,0 +1,1 @@
+# Base agent infrastructure for CAMEL.AI integration
