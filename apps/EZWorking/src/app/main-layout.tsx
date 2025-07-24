@@ -1,18 +1,17 @@
 'use client'
 
+import { UserMenu } from '@/components/user-menu/user-menu'
+import { Box, Button, HStack, Spacer, Text } from '@chakra-ui/react'
+import { useAuth } from '@saas-ui/auth'
 import {
   AppShell,
+  NavGroup,
+  NavItem,
   Sidebar,
   SidebarSection,
-  NavItem,
-  NavGroup,
-  PersonaAvatar,
 } from '@saas-ui/react'
-import { FiPlus } from 'react-icons/fi'
-import { Button, Box, Text, HStack, Spacer } from '@chakra-ui/react'
-import { useAuth } from '@saas-ui/auth'
 import Link from 'next/link'
-import { UserMenu } from '@/components/user-menu/user-menu'
+import { FiPlus, FiTarget } from 'react-icons/fi'
 
 const ChatHistoryItem = ({
   children,
@@ -55,20 +54,38 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
           borderRightWidth="1px"
         >
           <SidebarSection p="4">
-            <Button
-              variant="solid"
-              colorScheme="blue"
-              leftIcon={<FiPlus />}
-              width="full"
-              mb={4}
-              h="12"
-              fontSize="lg"
-            >
-              新建对话
-            </Button>
+            <Link href="/chat" passHref>
+              <Button
+                as="a"
+                variant="solid"
+                colorScheme="blue"
+                leftIcon={<FiPlus />}
+                width="full"
+                mb={4}
+                h="12"
+                fontSize="lg"
+              >
+                新建对话
+              </Button>
+            </Link>
             <NavGroup>
+              <Link href="/career-positioning" passHref>
+                <NavItem
+                  as="a"
+                  height="12"
+                  display="flex"
+                  alignItems="center"
+                  fontSize="lg"
+                  mb={2}
+                >
+                  <HStack spacing={2}>
+                    <FiTarget />
+                    <Text>职业定位分析</Text>
+                  </HStack>
+                </NavItem>
+              </Link>
               <ChatHistoryItem>初步求职策略</ChatHistoryItem>
-              <ChatHistoryItem isActive>简历修改建议...</ChatHistoryItem>
+              <ChatHistoryItem>简历修改建议...</ChatHistoryItem>
               <ChatHistoryItem>产品经理求职信...</ChatHistoryItem>
             </NavGroup>
           </SidebarSection>
@@ -79,7 +96,13 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
         </Sidebar>
       }
     >
-      <Box position="relative" height="full" width="full" bg="white" _dark={{ bg: 'gray.900' }}>
+      <Box
+        position="relative"
+        height="full"
+        width="full"
+        bg="white"
+        _dark={{ bg: 'gray.900' }}
+      >
         <Box position="absolute" top="1.5rem" right="1.5rem" zIndex="overlay">
           {isAuthenticated ? (
             <HStack spacing={3}>
@@ -110,7 +133,12 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
             </HStack>
           ) : (
             <Link href="/login" passHref>
-              <Button as="a" variant="solid" colorScheme="primary" boxShadow="md">
+              <Button
+                as="a"
+                variant="solid"
+                colorScheme="primary"
+                boxShadow="md"
+              >
                 请登录
               </Button>
             </Link>
@@ -122,4 +150,4 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
       </Box>
     </AppShell>
   )
-} 
+}
