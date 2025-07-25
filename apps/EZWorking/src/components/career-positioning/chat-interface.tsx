@@ -16,7 +16,7 @@ import {
   useColorModeValue,
   useToast,
 } from '@chakra-ui/react'
-import { FiMessageCircle, FiSend, FiUser, FiPaperclip, FiX } from 'react-icons/fi'
+import { FiMessageCircle, FiSend, FiUser, FiPaperclip, FiX, FiCheck, FiClock, FiAlertCircle, FiRefreshCw } from 'react-icons/fi'
 
 import { ProfileFormComponent } from './profile-form'
 import { AnalysisDisplayComponent } from './analysis-display'
@@ -33,6 +33,9 @@ export interface ChatMessage {
   componentData?: any
   timestamp: Date
   userId?: string
+  // Message status for auto-save functionality
+  status?: 'sending' | 'sent' | 'failed'
+  retryCount?: number
 }
 
 export type ComponentType =
@@ -46,6 +49,7 @@ export type ComponentType =
 interface ChatInterfaceProps {
   messages: ChatMessage[]
   onSendMessage: (message: string) => void
+  onRetryMessage?: (messageId: string) => void
   isLoading?: boolean
   userId?: string
 }
@@ -53,6 +57,7 @@ interface ChatInterfaceProps {
 export function ChatInterface({
   messages,
   onSendMessage,
+  onRetryMessage,
   isLoading = false,
   userId,
 }: ChatInterfaceProps) {
@@ -169,6 +174,7 @@ export function ChatInterface({
               messageBg={messageBg}
               userMessageBg={userMessageBg}
               userId={userId}
+              onRetryMessage={onRetryMessage}
             />
           ))}
 
@@ -313,6 +319,7 @@ interface MessageBubbleProps {
   messageBg: string
   userMessageBg: string
   userId?: string
+  onRetryMessage?: (messageId: string) => void
 }
 
 function MessageBubble({
@@ -321,7 +328,38 @@ function MessageBubble({
   messageBg,
   userMessageBg,
   userId,
+  onRetryMessage,
 }: MessageBubbleProps) {
+  const getStatusIcon = () => {
+    if (!isUser || !message.status) return null
+    
+    switch (message.status) {
+      case 'sending':
+        return <FiClock size={12} color="rgba(255,255,255,0.7)" />
+      case 'sent':
+        return <FiCheck size={12} color="rgba(255,255,255,0.7)" />
+      case 'failed':
+        return <FiAlertCircle size={12} color="rgba(255,255,255,0.9)" />
+      default:
+        return null
+    }
+  }
+
+  const getStatusText = () => {
+    if (!isUser || !message.status) return null
+    
+    switch (message.status) {
+      case 'sending':
+        return '发送中...'
+      case 'sent':
+        return '已发送'
+      case 'failed':
+        return `发送失败${message.retryCount ? ` (重试 ${message.retryCount}/3)` : ''}`
+      default:
+        return null
+    }
+  }
+
   return (
     <HStack
       spacing={3}
@@ -330,30 +368,52 @@ function MessageBubble({
     >
       {!isUser && <Avatar size="sm" icon={<FiMessageCircle />} bg="blue.500" />}
 
-      <Card
-        bg={isUser ? userMessageBg : messageBg}
-        color={isUser ? 'white' : 'inherit'}
-        maxW="70%"
-        borderRadius="lg"
-      >
-        <CardBody py={3} px={4}>
-          <Text fontSize="sm" whiteSpace="pre-wrap">
-            {message.content}
-          </Text>
+      <VStack spacing={1} align={isUser ? 'flex-end' : 'flex-start'}>
+        <Card
+          bg={isUser ? userMessageBg : messageBg}
+          color={isUser ? 'white' : 'inherit'}
+          maxW="70%"
+          borderRadius="lg"
+          opacity={message.status === 'failed' ? 0.8 : 1}
+        >
+          <CardBody py={3} px={4}>
+            <Text fontSize="sm" whiteSpace="pre-wrap">
+              {message.content}
+            </Text>
 
-          {/* Component rendering area */}
-          {message.componentType && (
-            <ComponentRenderer
-              message={message}
-              userId={userId}
-              onComponentSubmit={(componentId, data) => {
-                console.log('Component submitted:', componentId, data)
-                // This will be handled properly in task 3.1
-              }}
-            />
-          )}
-        </CardBody>
-      </Card>
+            {/* Component rendering area */}
+            {message.componentType && (
+              <ComponentRenderer
+                message={message}
+                userId={userId}
+                onComponentSubmit={(componentId, data) => {
+                  console.log('Component submitted:', componentId, data)
+                  // This will be handled properly in task 3.1
+                }}
+              />
+            )}
+          </CardBody>
+        </Card>
+
+        {/* Status indicator for user messages */}
+        {isUser && message.status && (
+          <HStack spacing={1} fontSize="xs" color="gray.500">
+            {getStatusIcon()}
+            <Text>{getStatusText()}</Text>
+            {message.status === 'failed' && onRetryMessage && (
+              <IconButton
+                aria-label="重试发送"
+                icon={<FiRefreshCw size={10} />}
+                size="xs"
+                variant="ghost"
+                colorScheme="gray"
+                onClick={() => onRetryMessage(message.id)}
+                ml={1}
+              />
+            )}
+          </HStack>
+        )}
+      </VStack>
 
       {isUser && <Avatar size="sm" icon={<FiUser />} bg="gray.500" />}
     </HStack>

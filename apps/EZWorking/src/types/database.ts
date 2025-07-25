@@ -256,6 +256,47 @@ export interface Database {
           updated_at?: string
         }
       }
+      chat_sessions: {
+        Row: {
+          id: string
+          user_id: string
+          title: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          title: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          title?: string
+          updated_at?: string
+        }
+      }
+      chat_messages: {
+        Row: {
+          id: string
+          session_id: string
+          role: 'user' | 'ai'
+          content: string
+          timestamp: string
+        }
+        Insert: {
+          id?: string
+          session_id: string
+          role: 'user' | 'ai'
+          content: string
+          timestamp?: string
+        }
+        Update: {
+          id?: string
+          content?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never

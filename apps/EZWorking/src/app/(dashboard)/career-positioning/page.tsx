@@ -10,7 +10,16 @@ import { useAuth } from '@/hooks/useAuth'
 export default function CareerPositioningPage() {
   const [showWelcome, setShowWelcome] = useState(true)
   const { user, loading: authLoading, userId } = useAuth()
-  const { messages, isLoading, sendMessage, addComponentMessage, addMessage } = useChat({ userId })
+  const { messages, isLoading, sendMessage, addComponentMessage, addMessage, currentSessionId } = useChat({ userId })
+
+  // Reset welcome state when session changes or when there are messages
+  useEffect(() => {
+    if (messages.length > 0) {
+      setShowWelcome(false)
+    } else {
+      setShowWelcome(true)
+    }
+  }, [messages.length, currentSessionId])
 
   // Initialize with welcome message when chat starts
   useEffect(() => {

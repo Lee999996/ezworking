@@ -3,6 +3,7 @@
 import { SaasProvider } from '@saas-ui/react'
 import { AuthProvider } from '@saas-ui/auth'
 import { authService } from '@/services/auth'
+import { ErrorProvider } from '@/contexts/error-context'
 
 export default function RootLayout({
   children,
@@ -14,7 +15,9 @@ export default function RootLayout({
       <body>
         <SaasProvider>
           <AuthProvider {...authService}>
-            {children}
+            <ErrorProvider>
+              {children}
+            </ErrorProvider>
           </AuthProvider>
         </SaasProvider>
       </body>

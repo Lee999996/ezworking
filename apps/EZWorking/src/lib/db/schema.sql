@@ -353,6 +353,28 @@ CREATE TABLE skill_gap_analyses (
 );
 
 -- ==============================================
+-- 聊天历史表
+-- ==============================================
+
+-- 聊天会话表
+CREATE TABLE chat_sessions (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  title VARCHAR(100) NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 聊天消息表
+CREATE TABLE chat_messages (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  session_id UUID NOT NULL REFERENCES chat_sessions(id) ON DELETE CASCADE,
+  role VARCHAR(10) NOT NULL CHECK (role IN ('user', 'ai')),
+  content TEXT NOT NULL,
+  timestamp TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- ==============================================
 -- 岗位信息表
 -- ==============================================
 
@@ -498,6 +520,12 @@ CREATE INDEX idx_career_recommendations_user_id ON career_recommendations(user_i
 CREATE INDEX idx_career_paths_user_id ON career_paths(user_id);
 CREATE INDEX idx_skill_gap_analyses_user_id ON skill_gap_analyses(user_id);
 
+-- 聊天历史索引
+CREATE INDEX idx_chat_sessions_user_id ON chat_sessions(user_id);
+CREATE INDEX idx_chat_sessions_created_at ON chat_sessions(created_at);
+CREATE INDEX idx_chat_messages_session_id ON chat_messages(session_id);
+CREATE INDEX idx_chat_messages_timestamp ON chat_messages(timestamp);
+
 -- 岗位信息索引
 CREATE INDEX idx_jobs_company_id ON jobs(company_id);
 CREATE INDEX idx_jobs_status ON jobs(status);
@@ -547,6 +575,7 @@ CREATE TRIGGER update_job_applications_updated_at BEFORE UPDATE ON job_applicati
 CREATE TRIGGER update_job_matches_updated_at BEFORE UPDATE ON job_matches FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_job_filters_updated_at BEFORE UPDATE ON job_filters FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_job_recommendation_settings_updated_at BEFORE UPDATE ON job_recommendation_settings FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_chat_sessions_updated_at BEFORE UPDATE ON chat_sessions FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- ==============================================
 -- 行级安全策略 (RLS) 设置
@@ -584,6 +613,8 @@ ALTER TABLE job_applications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE job_matches ENABLE ROW LEVEL SECURITY;
 ALTER TABLE job_filters ENABLE ROW LEVEL SECURITY;
 ALTER TABLE job_recommendation_settings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE chat_sessions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE chat_messages ENABLE ROW LEVEL SECURITY;
 
 -- 用户只能访问自己的数据
 CREATE POLICY "Users can view own profile" ON user_profiles FOR SELECT USING (auth.uid()::text = id::text);
@@ -603,6 +634,27 @@ CREATE POLICY "Users can manage own languages" ON languages FOR ALL USING (auth.
 
 CREATE POLICY "Users can view own projects" ON projects FOR SELECT USING (auth.uid()::text = user_id::text);
 CREATE POLICY "Users can manage own projects" ON projects FOR ALL USING (auth.uid()::text = user_id::text);
+
+-- 聊天历史RLS策略
+CREATE POLICY "Users can view own chat sessions" ON chat_sessions FOR SELECT USING (auth.uid()::text = user_id::text);
+CREATE POLICY "Users can manage own chat sessions" ON chat_sessions FOR ALL USING (auth.uid()::text = user_id::text);
+
+CREATE POLICY "Users can view own chat messages" ON chat_messages 
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM chat_sessions cs 
+      WHERE cs.id = chat_messages.session_id 
+      AND cs.user_id::text = auth.uid()::text
+    )
+  );
+CREATE POLICY "Users can manage own chat messages" ON chat_messages 
+  FOR ALL USING (
+    EXISTS (
+      SELECT 1 FROM chat_sessions cs 
+      WHERE cs.id = chat_messages.session_id 
+      AND cs.user_id::text = auth.uid()::text
+    )
+  );
 
 -- 公共只读表（不需要RLS策略）
 -- assessment_templates, assessment_questions, assessment_dimensions, careers, companies, jobs
